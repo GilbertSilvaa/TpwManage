@@ -89,11 +89,13 @@ public class ProductRepository(MyContext context) : IProductRepository
     }
   }
 
-  public async Task<bool> ExistsAsync(string name)
+  public async Task<bool> ExistsAsync(string name, string color)
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(c => c.Name.Equals(name)); 
+      var response = await _dataSet.SingleOrDefaultAsync(c => 
+        c.Name.Equals(name) && c.Color.Equals(color)); 
+        
       return response != null;
     }
     catch (Exception ex) 
