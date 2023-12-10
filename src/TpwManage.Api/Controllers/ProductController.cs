@@ -1,18 +1,18 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using TpwManage.Application.InputModels;
-using TpwManage.Application.Services.ClientService;
+using TpwManage.Application.Services.ProductService;
 
 namespace TpwManage.Api.Controllers;
 
 [ApiController]
-[Route("api/client")]
-public class ClientController(IClientService service) : ControllerBase
+[Route("api/product")]
+public class ProductController(IProductService service) : ControllerBase
 {
-  private readonly IClientService _service = service;
+  private readonly IProductService _service = service;
 
   [HttpGet]
-  public async Task<IActionResult> GetAll() 
+  public async Task<IActionResult> GetAll()
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -28,7 +28,7 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpGet]
-  [Route("{id}", Name = "GetClientById")]
+  [Route("{id}", Name = "GetProductById")]
   public async Task<IActionResult> Get(Guid id)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -46,14 +46,14 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create([FromBody] CreateClientInputModel model)
+  public async Task<IActionResult> Create([FromBody] CreateProductInputModel model)
   {
     if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
     
     try 
     {
       var response = await _service.Create(model);
-      var linkRedirect = Url.Link("GetClientById", new { id =  response.Id})!;
+      var linkRedirect = Url.Link("GetProductById", new { id =  response.Id})!;
       return Created(new Uri(linkRedirect), response);
     }
     catch(Exception ex)
@@ -63,7 +63,7 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpPut]
-  public async Task<IActionResult> Update([FromBody] UpdateClientInputModel model)
+  public async Task<IActionResult> Update([FromBody] UpdateProductInputModel model)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -89,7 +89,7 @@ public class ClientController(IClientService service) : ControllerBase
     {
       var response = await _service.Delete(id);
       
-      return !response ? NotFound() : Ok("Cliente deletado com sucesso.");
+      return !response ? NotFound() : Ok("Produto deletado com sucesso.");
     }
     catch(Exception ex)
     {
