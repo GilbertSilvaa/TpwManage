@@ -13,9 +13,7 @@ public class ClientService(IClientRepository repository) : IClientService
     try 
     {
       var response = await _repository.GetAllAsync();
-      return response.Select(c => ClientViewModel.FromEntity(c))
-        .OrderBy(c => c.Name)
-        .ToList();
+      return [.. response.Select(c => ClientViewModel.FromEntity(c)).OrderBy(c => c.Name)];
     }
     catch(Exception ex)
     {
