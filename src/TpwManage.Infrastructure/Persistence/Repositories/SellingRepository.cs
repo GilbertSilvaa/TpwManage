@@ -19,7 +19,8 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
     catch (Exception ex) 
     {
-      throw new Exception(ex.Message);
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
     }
   }
 
@@ -32,7 +33,8 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
     catch (Exception ex) 
     {
-      throw new Exception(ex.Message);
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
     }
   }
 
@@ -46,7 +48,8 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
     catch (Exception ex) 
     {
-      throw new Exception(ex.Message);
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
     }
   }
 
@@ -63,7 +66,8 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
     catch (Exception ex) 
     {
-      throw new Exception(ex.Message);
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
     }
   }
 
@@ -80,7 +84,8 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
     catch (Exception ex) 
     {
-      throw new Exception(ex.Message);
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
     }
   }
 }
