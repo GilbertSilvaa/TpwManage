@@ -9,4 +9,5 @@ public interface IClientRepository
   Task<Client> CreateAsync(Client client);
   Task<Client?> UpdateAsync(Client client);
   Task<bool> DeleteAsync(Guid id);
+  Task<bool> ExistsAsync(string name);
 }

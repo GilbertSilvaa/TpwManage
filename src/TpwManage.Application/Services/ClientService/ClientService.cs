@@ -13,6 +13,11 @@ public class ClientService(IClientRepository repository) : IClientService
     try 
     {
       var client = model.ToEntity();
+      var clientExists = await _repository.ExistsAsync(client.Name);
+
+      if(clientExists)    
+        throw new InvalidOperationException("Já existe um cliente com esse nome.");
+        
       var response = await _repository.CreateAsync(client);
       return ClientViewModel.FromEntity(response);
     }
