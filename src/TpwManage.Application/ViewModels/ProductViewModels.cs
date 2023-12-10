@@ -7,8 +7,7 @@ public class ProductViewModel(
   string name, 
   string color, 
   float price, 
-  int amount, 
-  DateTime dateSale
+  int amount
 )
 {
   public Guid Id { get; private set; } = id;
@@ -16,7 +15,6 @@ public class ProductViewModel(
   public string Color { get; set; } = color;
   public float Price { get; set; } = price;
   public int Amount { get; set; } = amount;
-  public DateTime DateSale { get; set; } = dateSale;
 
   public static ProductViewModel FromEntity(Product product) 
     => new(
@@ -24,7 +22,6 @@ public class ProductViewModel(
       product.Name, 
       product.Color, 
       product.Price, 
-      product.Amount, 
-      product.CreateAt
+      product.Amount
     ); 
 }
