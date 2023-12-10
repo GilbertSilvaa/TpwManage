@@ -88,4 +88,18 @@ public class ProductRepository(MyContext context) : IProductRepository
       throw new Exception(messageException);
     }
   }
+
+  public async Task<bool> ExistsAsync(string name)
+  {
+    try 
+    {
+      var response = await _dataSet.SingleOrDefaultAsync(c => c.Name.Equals(name)); 
+      return response != null;
+    }
+    catch (Exception ex) 
+    {
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
+    }
+  }
 }
