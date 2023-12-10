@@ -1,6 +1,5 @@
 using TpwManage.Application.InputModels;
 using TpwManage.Application.ViewModels;
-using TpwManage.Core.Entities;
 using TpwManage.Core.Repositories;
 
 namespace TpwManage.Application.Services.ClientService;
@@ -14,7 +13,9 @@ public class ClientService(IClientRepository repository) : IClientService
     try 
     {
       var response = await _repository.GetAllAsync();
-      return response.Select(c => ClientViewModel.FromEntity(c)).ToList();
+      return response.Select(c => ClientViewModel.FromEntity(c))
+        .OrderBy(c => c.Name)
+        .ToList();
     }
     catch(Exception ex)
     {
@@ -62,7 +63,7 @@ public class ClientService(IClientRepository repository) : IClientService
     {
       var response = await _repository.UpdateAsync(model.ToEntity()) 
         ?? throw new KeyNotFoundException("Cliente não encontrado.");
-        
+
       return ClientViewModel.FromEntity(response);
     }
     catch(Exception ex)

@@ -14,6 +14,8 @@ public class ClientController(IClientService service) : ControllerBase
   [HttpGet]
   public async Task<IActionResult> GetAll() 
   {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
     try 
     {
       var response = await _service.GetAll();
@@ -25,19 +27,73 @@ public class ClientController(IClientService service) : ControllerBase
     }
   }
 
+  [HttpGet]
+  [Route("{id}", Name = "GetById")]
+  public async Task<IActionResult> Get(Guid id)
+  {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    try 
+    {
+      var response = await _service.GetById(id);      
+
+      return response == null ? NotFound() : Ok(response);
+    }
+    catch(Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
+  }
+
   [HttpPost]
-  public async Task<IActionResult> Create(CreateClientInputModel model)
+  public async Task<IActionResult> Create([FromBody] CreateClientInputModel model)
   {
     if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
     
     try 
     {
-      await _service.Create(model);
-      return Created();
+      var response = await _service.Create(model);
+      var linkRedirect = Url.Link("GetById", new { id =  response.Id})!;
+      return Created(new Uri(linkRedirect), response);
     }
     catch(Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }  
+  }
+
+  [HttpPut]
+  public async Task<IActionResult> Update([FromBody] UpdateClientInputModel model)
+  {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    try 
+    {
+      var response = await _service.Update(model);
+      
+      return response == null ? NotFound() : Ok(response);
+    }
+    catch(Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
+  }
+
+  [HttpDelete]
+  [Route("{id}")]
+  public async Task<IActionResult> Delete(Guid id)
+  {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    try 
+    {
+      var response = await _service.Delete(id);
+      
+      return !response ? NotFound() : Ok("Cliente deletado com sucesso.");
+    }
+    catch(Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
   }
 }
