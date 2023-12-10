@@ -1,13 +1,7 @@
 namespace TpwManage.Core.Entities;
 
-public abstract class EntityBase
+public abstract class EntityBase(Guid? id = null)
 {
-  public EntityBase()
-  {
-    Id = Guid.NewGuid();
-    CreateAt = DateTime.UtcNow;
-  }
-
-  public Guid Id { get; private set; }
-  public DateTime CreateAt { get; private set; }
+  public Guid Id { get; set; } = id ?? Guid.NewGuid();
+  public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 }
