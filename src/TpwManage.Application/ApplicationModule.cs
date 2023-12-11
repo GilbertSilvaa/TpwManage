@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TpwManage.Application.Services.ClientService;
 using TpwManage.Application.Services.ProductService;
+using TpwManage.Application.Services.SellingService;
 
 namespace TpwManage.Application;
 
@@ -16,6 +17,7 @@ public static class ApplicationModule
   {
     services.AddScoped<IClientService, ClientService>();
     services.AddScoped<IProductService, ProductService>();
+    services.AddScoped<ISellingService, SellingService>();
     return services;
   }
 }
