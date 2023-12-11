@@ -2,13 +2,7 @@ using TpwManage.Core.Entities;
 
 namespace TpwManage.Application.ViewModels;
 
-public class ProductViewModel(
-  Guid id,
-  string name, 
-  string color, 
-  float price, 
-  int amount
-)
+public class ProductViewModel(Guid id, string name, string color, float price, int amount)
 {
   public Guid Id { get; private set; } = id;
   public string Name { get; private set; } = name;
