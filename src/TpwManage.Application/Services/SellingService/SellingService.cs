@@ -54,7 +54,11 @@ public class SellingService(
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product != null) productList.Add(product);
+        if(product != null) 
+        {
+          var stockExists = await RemoveProductStock(product, 1);
+          if(stockExists) productList.Add(product);
+        }
       }
 
       Selling selling = new(){ Client = client };
@@ -69,27 +73,12 @@ public class SellingService(
     }
   }
 
-  public async Task<SellingViewModel> Update(UpdateSellingInputModel model)
+  public async Task<bool> Delete(Guid id)
   {
-    try
+    try 
     {
-      var client = await _clientRepository.GetByIdAsync(model.ClientId)
-        ?? throw new KeyNotFoundException("Cliente não encontrado.");
-
-      var productList = new List<Product>();
-      foreach(var productId in model.ProductsId)
-      {
-        var product = await _productRepository.GetByIdAsync(productId);
-        if(product != null) productList.Add(product);
-      }
-
-      Selling selling = new(){ Id = model.Id, Client = client };
-      selling.SetupProducts(productList);
-
-      var response = await _sellingRepository.UpdateAsync(selling)
-        ?? throw new KeyNotFoundException("Venda não encontrada.");
-
-      return SellingViewModel.FromEntity(response);
+      var response = await _sellingRepository.DeleteAsync(id);
+      return response;
     }
     catch(Exception ex)
     {
@@ -97,12 +86,16 @@ public class SellingService(
     }
   }
 
-  public async Task<bool> Delete(Guid id)
+  private async Task<bool> RemoveProductStock(Product product, int amount)
   {
     try 
     {
-      var response = await _sellingRepository.DeleteAsync(id);
-      return response;
+      if(product.Amount == 0) return false;
+
+      product.Amount -= amount; 
+      var response = await _productRepository.UpdateAsync(product);
+      
+      return response != null;
     }
     catch(Exception ex)
     {
