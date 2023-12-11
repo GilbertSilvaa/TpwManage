@@ -10,5 +10,8 @@ public class SellingMap : IEntityTypeConfiguration<Selling>
   {
     builder.ToTable("Sellings");
     builder.HasKey(s => s.Id);
+
+    builder.HasOne(s => s.Client).WithMany();
+    builder.HasMany(s => s.Products).WithMany();
   }
 }
