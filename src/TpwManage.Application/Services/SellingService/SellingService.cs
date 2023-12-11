@@ -50,8 +50,7 @@ public class SellingService(
       var client = await _clientRepository.GetByIdAsync(model.ClientId)
         ?? throw new KeyNotFoundException("Cliente não encontrado.");
 
-      List<Product> productList = [];
-
+      var productList = new List<Product>();
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
