@@ -5,7 +5,7 @@
 namespace TpwManage.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateMigrationSetId : Migration
+    public partial class Mrestourage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

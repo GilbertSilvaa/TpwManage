@@ -19,6 +19,21 @@ namespace TpwManage.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("ProductSelling", b =>
+                {
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("SellingId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("ProductsId", "SellingId");
+
+                    b.HasIndex("SellingId");
+
+                    b.ToTable("ProductSelling");
+                });
+
             modelBuilder.Entity("TpwManage.Core.Entities.Client", b =>
                 {
                     b.Property<Guid>("Id")
@@ -63,12 +78,7 @@ namespace TpwManage.Infrastructure.Persistence.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("float");
 
-                    b.Property<Guid?>("SellingId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SellingId");
 
                     b.ToTable("Products", (string)null);
                 });
@@ -95,11 +105,19 @@ namespace TpwManage.Infrastructure.Persistence.Migrations
                     b.ToTable("Sellings", (string)null);
                 });
 
-            modelBuilder.Entity("TpwManage.Core.Entities.Product", b =>
+            modelBuilder.Entity("ProductSelling", b =>
                 {
+                    b.HasOne("TpwManage.Core.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TpwManage.Core.Entities.Selling", null)
-                        .WithMany("Products")
-                        .HasForeignKey("SellingId");
+                        .WithMany()
+                        .HasForeignKey("SellingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TpwManage.Core.Entities.Selling", b =>
@@ -111,11 +129,6 @@ namespace TpwManage.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
-                });
-
-            modelBuilder.Entity("TpwManage.Core.Entities.Selling", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
