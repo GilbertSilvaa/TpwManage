@@ -14,7 +14,11 @@ public class SellingRepository(MyContext context) : ISellingRepository
   {
     try 
     {
-      var response = await _dataSet.ToListAsync();
+      var response = await _dataSet
+        .Include(s => s.Products)
+        .Include(s => s.Client)
+        .ToListAsync();
+        
       return response;
     }
     catch (Exception ex) 
