@@ -62,6 +62,23 @@ public class SellingController(ISellingService service) : ControllerBase
     }  
   }
   
+  [HttpPut]
+  public async Task<IActionResult> Update([FromBody] UpdateSellingInputModel model)
+  {
+    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
+
+    try 
+    {
+      var response = await _service.Update(model);
+      
+      return response == null ? NotFound() : Ok(response);
+    }
+    catch(Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
+  }
+
   [HttpDelete]
   [Route("{id}")]
   public async Task<IActionResult> Delete(Guid id)

@@ -65,7 +65,7 @@ public class ProductController(IProductService service) : ControllerBase
   [HttpPut]
   public async Task<IActionResult> Update([FromBody] UpdateProductInputModel model)
   {
-    if (!ModelState.IsValid) return BadRequest(ModelState);
+    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
 
     try 
     {

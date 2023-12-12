@@ -13,4 +13,6 @@ public class Selling : EntityBase
       Products.Add(product);
     }
   }
+
+  public void ClearProducts() => Products.Clear();
 }

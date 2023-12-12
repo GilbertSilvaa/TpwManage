@@ -50,22 +50,64 @@ public class SellingService(
       var client = await _clientRepository.GetByIdAsync(model.ClientId)
         ?? throw new KeyNotFoundException("Cliente não encontrado.");
 
-      var productList = new List<Product>();
+      List<Product> productList = [];
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
         if(product != null) 
         {
-          var stockExists = await RemoveProductStock(product, 1);
+          var stockExists = await ControllerProductStock(product, 1, false);
           if(stockExists) productList.Add(product);
         }
       }
 
-      Selling selling = new(){ Client = client };
+      Selling selling = new()
+      { 
+        Client = client 
+      };
       selling.SetupProducts(productList);
 
       var response = await _sellingRepository.CreateAsync(selling);
       return SellingViewModel.FromEntity(response);
+    }
+    catch(Exception ex)
+    {
+      throw new Exception(ex.Message);
+    }
+  }
+
+  public async Task<SellingViewModel> Update(UpdateSellingInputModel model)
+  {
+    try
+    {
+      var oldSelling = await _sellingRepository.GetByIdAsync(model.Id)
+        ?? throw new KeyNotFoundException("Venda não encontrada.");
+      
+      foreach (var oldProduct in oldSelling.Products)
+        await ControllerProductStock(oldProduct, 1, true);   
+      
+      List<Product> productList = [];
+      foreach(var productId in model.ProductsId)
+      {
+        var product = await _productRepository.GetByIdAsync(productId);
+        if(product != null) 
+        {
+          var stockExists = await ControllerProductStock(product, 1, false);
+          if(stockExists) productList.Add(product);
+        }
+      }
+
+      Selling selling = new()
+      { 
+        Id = model.Id, 
+        Client = oldSelling.Client 
+      };
+
+      selling.SetupProducts(productList);
+      selling.CreateAt = oldSelling.CreateAt;
+
+      var response = await _sellingRepository.UpdateAsync(selling);
+      return SellingViewModel.FromEntity(response!);
     }
     catch(Exception ex)
     {
@@ -86,20 +128,17 @@ public class SellingService(
     }
   }
 
-  public Task<SellingViewModel> Update(UpdateSellingInputModel model)
-  {
-    throw new NotImplementedException();
-  }
-
-  private async Task<bool> RemoveProductStock(Product product, int amount)
+  private async Task<bool> ControllerProductStock(Product product, int amount, bool isAdd)
   {
     try 
     {
       if(product.Amount == 0) return false;
 
-      product.Amount -= amount; 
-      var response = await _productRepository.UpdateAsync(product);
-      
+      product.Amount = isAdd 
+        ? product.Amount + amount 
+        : product.Amount - amount;
+
+      var response = await _productRepository.UpdateAsync(product);      
       return response != null;
     }
     catch(Exception ex)
