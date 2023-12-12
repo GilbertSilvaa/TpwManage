@@ -32,7 +32,11 @@ public class SellingRepository(MyContext context) : ISellingRepository
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(c => c.Id.Equals(id));
+      var response = await _dataSet
+        .Include(s => s.Products)
+        .Include(s => s.Client)
+        .SingleOrDefaultAsync(c => c.Id.Equals(id));
+
       return response;
     }
     catch (Exception ex) 
@@ -42,13 +46,13 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
   }
 
-  public async Task<Selling> CreateAsync(Selling Selling)
+  public async Task<Selling> CreateAsync(Selling selling)
   {
     try 
     {
-      _dataSet.Add(Selling);
+      _dataSet.Add(selling);
       await _context.SaveChangesAsync();
-      return Selling;
+      return selling;
     }
     catch (Exception ex) 
     {
@@ -57,14 +61,14 @@ public class SellingRepository(MyContext context) : ISellingRepository
     }
   }
 
-  public async Task<Selling?> UpdateAsync(Selling Selling)
+  public async Task<Selling?> UpdateAsync(Selling selling)
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(c => c.Id.Equals(Selling.Id));
+      var response = await _dataSet.SingleOrDefaultAsync(c => c.Id.Equals(selling.Id));
       if(response == null) return null;
 
-      _context.Entry(response).CurrentValues.SetValues(Selling);
+      _context.Entry(response).CurrentValues.SetValues(selling);
       await _context.SaveChangesAsync();
       return response;
     }

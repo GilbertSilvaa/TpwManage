@@ -86,6 +86,11 @@ public class SellingService(
     }
   }
 
+  public Task<SellingViewModel> Update(UpdateSellingInputModel model)
+  {
+    throw new NotImplementedException();
+  }
+
   private async Task<bool> RemoveProductStock(Product product, int amount)
   {
     try 

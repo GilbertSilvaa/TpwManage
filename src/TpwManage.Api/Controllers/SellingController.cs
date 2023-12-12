@@ -27,6 +27,24 @@ public class SellingController(ISellingService service) : ControllerBase
     }
   }
 
+  [HttpGet]
+  [Route("{id}", Name = "GetSellingById")]
+  public async Task<IActionResult> GetById(Guid id)
+  {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    try 
+    {
+      var response = await _service.GetById(id);
+
+      return response == null ? NotFound() : Ok(response);
+    }
+    catch(Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
+  }
+
   [HttpPost]
   public async Task<IActionResult> Create([FromBody] CreateSellingInputModel model)
   {
@@ -35,11 +53,30 @@ public class SellingController(ISellingService service) : ControllerBase
     try 
     {
       var response = await _service.Create(model);
-      return Created();
+      var linkRedirect = Url.Link("GetSellingById", new { id = response.Id })!;
+      return Created(new Uri(linkRedirect), response);
     }
     catch(Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }  
+  }
+  
+  [HttpDelete]
+  [Route("{id}")]
+  public async Task<IActionResult> Delete(Guid id)
+  {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    try 
+    {
+      var response = await _service.Delete(id);
+      
+      return !response ? NotFound() : Ok("Venda deletada com sucesso.");
+    }
+    catch(Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
   }
 }

@@ -38,13 +38,13 @@ public class ProductRepository(MyContext context) : IProductRepository
     }
   }
 
-  public async Task<Product> CreateAsync(Product Product)
+  public async Task<Product> CreateAsync(Product product)
   {
     try 
     {
-      _dataSet.Add(Product);
+      _dataSet.Add(product);
       await _context.SaveChangesAsync();
-      return Product;
+      return product;
     }
     catch (Exception ex) 
     {
@@ -53,14 +53,14 @@ public class ProductRepository(MyContext context) : IProductRepository
     }
   }
 
-  public async Task<Product?> UpdateAsync(Product Product)
+  public async Task<Product?> UpdateAsync(Product product)
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(c => c.Id.Equals(Product.Id));
+      var response = await _dataSet.SingleOrDefaultAsync(c => c.Id.Equals(product.Id));
       if(response == null) return null;
 
-      _context.Entry(response).CurrentValues.SetValues(Product);
+      _context.Entry(response).CurrentValues.SetValues(product);
       await _context.SaveChangesAsync();
       return response;
     }
