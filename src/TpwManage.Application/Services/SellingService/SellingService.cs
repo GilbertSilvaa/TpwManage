@@ -43,6 +43,7 @@ public class SellingService(
       throw new Exception(ex.Message);
     }
   }
+  
   public async Task<SellingViewModel> Create(CreateSellingInputModel model)
   {
     try
