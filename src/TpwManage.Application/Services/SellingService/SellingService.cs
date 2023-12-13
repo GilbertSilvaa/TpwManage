@@ -35,7 +35,7 @@ public class SellingService(
     {
       var response = await _sellingRepository.GetByIdAsync(id) 
         ?? throw new KeyNotFoundException("Venda não encontrada.");
-        
+              
       return SellingViewModel.FromEntity(response);
     }
     catch(Exception ex)
@@ -54,11 +54,10 @@ public class SellingService(
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product != null) 
-        {
-          var stockExists = await ControllerProductStock(product, 1, false);
-          if(stockExists) productList.Add(product);
-        }
+        if(product == null) continue;
+        
+        var stockExists = await ControllerProductStock(product, 1, false);
+        if(stockExists) productList.Add(product);
       }
 
       Selling selling = new()
@@ -90,21 +89,19 @@ public class SellingService(
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product != null) 
-        {
-          var stockExists = await ControllerProductStock(product, 1, false);
-          if(stockExists) productList.Add(product);
-        }
+        if(product == null) continue;    
+
+        var stockExists = await ControllerProductStock(product, 1, false);
+        if(stockExists) productList.Add(product);
       }
 
       Selling selling = new()
       { 
         Id = model.Id, 
-        Client = oldSelling.Client 
+        Client = oldSelling.Client,
+        CreateAt = oldSelling.CreateAt
       };
-
       selling.SetupProducts(productList);
-      selling.CreateAt = oldSelling.CreateAt;
 
       var response = await _sellingRepository.UpdateAsync(selling);
       return SellingViewModel.FromEntity(response!);
