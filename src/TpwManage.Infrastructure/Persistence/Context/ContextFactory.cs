@@ -7,7 +7,7 @@ public class ContextFactory : IDesignTimeDbContextFactory<MyContext>
 {
   public MyContext CreateDbContext(string[] args)
   {
-    string conn = DbConfig.ConnectionString;
+    string conn = Environment.GetEnvironmentVariable("CONNECTION")!;
     var optionsBuilder = new DbContextOptionsBuilder<MyContext>();
     optionsBuilder.UseMySql(conn, ServerVersion.AutoDetect(conn));
 

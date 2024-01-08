@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TpwManage.Core.Repositories;
-using TpwManage.Infrastructure.Persistence;
 using TpwManage.Infrastructure.Persistence.Context;
 using TpwManage.Infrastructure.Persistence.Repositories;
 
@@ -19,7 +18,7 @@ public static class InfrastructureModule
 
   private static IServiceCollection AddDbConfig(this IServiceCollection services)
   {
-    string conn = DbConfig.ConnectionString;
+    string conn = Environment.GetEnvironmentVariable("CONNECTION")!;
     services.AddDbContext<MyContext>(options => 
       options.UseMySql(conn, ServerVersion.AutoDetect(conn)));
     return services;
