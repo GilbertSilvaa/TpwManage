@@ -17,7 +17,7 @@ public class ProductRepository(MyContext context) :
         
       return response is not null;
     }
-    catch (Exception ex) 
+    catch(Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);

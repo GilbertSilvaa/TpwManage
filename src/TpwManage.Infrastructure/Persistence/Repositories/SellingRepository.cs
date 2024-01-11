@@ -19,7 +19,7 @@ public class SellingRepository(MyContext context) :
         
       return response;
     }
-    catch (Exception ex) 
+    catch(Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -37,7 +37,7 @@ public class SellingRepository(MyContext context) :
 
       return response;
     }
-    catch (Exception ex) 
+    catch(Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -58,7 +58,7 @@ public class SellingRepository(MyContext context) :
       await _context.SaveChangesAsync();
       return response;
     }
-    catch (Exception ex) 
+    catch(Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
