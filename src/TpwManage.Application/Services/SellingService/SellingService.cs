@@ -20,7 +20,7 @@ public class SellingService(
     try 
     {
       var response = await _sellingRepository.GetAllAsync();
-      return [.. response.Select(s => SellingViewModel.FromEntity(s))
+      return [.. response.Select(SellingViewModel.FromEntity)
         .OrderByDescending(s => s.DateSale)];
     }
     catch(Exception ex)
@@ -34,8 +34,8 @@ public class SellingService(
     try 
     {
       var response = await _sellingRepository.GetByIdAsync(id) 
-        ?? throw new KeyNotFoundException("Venda não encontrada.");
-              
+        ?? throw new KeyNotFoundException("Venda não encontrada.");   
+
       return SellingViewModel.FromEntity(response);
     }
     catch(Exception ex)
@@ -57,14 +57,15 @@ public class SellingService(
         var product = await _productRepository.GetByIdAsync(productId);
         if(product == null) continue;
         
-        var stockExists = await ControllerProductStock(product, 1, false);
+        var stockExists = await ChangeAmountProductStock(product, -1);
         if(stockExists) productList.Add(product);
       }
 
       Selling selling = new()
-      { 
-        Client = client 
+      {
+        Client = client
       };
+
       selling.SetupProducts(productList);
 
       var response = await _sellingRepository.CreateAsync(selling);
@@ -80,11 +81,11 @@ public class SellingService(
   {
     try
     {
-      var oldSelling = await _sellingRepository.GetByIdAsync(model.Id)
+      var selling = await _sellingRepository.GetByIdAsync(model.Id)
         ?? throw new KeyNotFoundException("Venda não encontrada.");
       
-      foreach (var oldProduct in oldSelling.Products)
-        await ControllerProductStock(oldProduct, 1, true);   
+      foreach (var product in selling.Products)
+        await ChangeAmountProductStock(product, 1);   
       
       List<Product> productList = [];
       foreach(var productId in model.ProductsId)
@@ -92,19 +93,20 @@ public class SellingService(
         var product = await _productRepository.GetByIdAsync(productId);
         if(product == null) continue;    
 
-        var stockExists = await ControllerProductStock(product, 1, false);
+        var stockExists = await ChangeAmountProductStock(product, -1);
         if(stockExists) productList.Add(product);
       }
 
-      Selling selling = new()
+      Selling sellingUpdate = new()
       { 
         Id = model.Id, 
-        Client = oldSelling.Client,
-        CreateAt = oldSelling.CreateAt
+        Client = selling.Client,
+        CreateAt = selling.CreateAt
       };
-      selling.SetupProducts(productList);
+      
+      sellingUpdate.SetupProducts(productList);
 
-      var response = await _sellingRepository.UpdateAsync(selling);
+      var response = await _sellingRepository.UpdateAsync(sellingUpdate);
       return SellingViewModel.FromEntity(response!);
     }
     catch(Exception ex)
@@ -126,18 +128,15 @@ public class SellingService(
     }
   }
 
-  private async Task<bool> ControllerProductStock(Product product, int amount, bool isAdd)
+  private async Task<bool> ChangeAmountProductStock(Product product, int amount)
   {
     try 
     {
       if(product.Amount == 0) return false;
-
-      product.Amount = isAdd 
-        ? product.Amount + amount 
-        : product.Amount - amount;
-
+      
+      product.Amount += amount;
       var response = await _productRepository.UpdateAsync(product);      
-      return response != null;
+      return response is not null;
     }
     catch(Exception ex)
     {
