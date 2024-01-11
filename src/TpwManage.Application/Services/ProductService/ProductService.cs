@@ -43,8 +43,7 @@ public class ProductService(IProductRepository repository) : IProductService
       var product = model.ToEntity();     
       var productExists = await _repository.ExistsAsync(product.Name, product.Color);
       
-      if(productExists)    
-        throw new InvalidOperationException("Esse produto já existe.");
+      if(productExists) throw new InvalidOperationException("Esse produto já existe.");
 
       var response = await _repository.CreateAsync(product);
       return ProductViewModel.FromEntity(response);
