@@ -55,7 +55,7 @@ public class SellingService(
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product == null) continue;
+        if(product is null) continue;
         
         var stockExists = await ChangeAmountProductStock(product, -1);
         if(stockExists) productList.Add(product);
@@ -91,7 +91,7 @@ public class SellingService(
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product == null) continue;    
+        if(product is null) continue;    
 
         var stockExists = await ChangeAmountProductStock(product, -1);
         if(stockExists) productList.Add(product);
@@ -99,7 +99,7 @@ public class SellingService(
 
       Selling sellingUpdate = new()
       { 
-        Id = model.Id, 
+        Id = selling.Id, 
         Client = selling.Client,
         CreateAt = selling.CreateAt
       };
