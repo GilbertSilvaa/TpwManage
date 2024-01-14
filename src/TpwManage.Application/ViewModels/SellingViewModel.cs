@@ -22,7 +22,7 @@ public class SellingViewModel(
       selling.TotalPrice, 
       selling.CreateAt,
       ClientViewModel.FromEntity(selling.Client), 
-      [.. selling.Products.Select(p => ProductSellingViewModel.FromEntity(p))]
+      [.. selling.Products.Select(ProductSellingViewModel.FromEntity)]
     );
 }
 

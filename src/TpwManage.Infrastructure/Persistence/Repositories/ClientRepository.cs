@@ -13,7 +13,7 @@ public class ClientRepository(MyContext context) :
     try 
     {
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Name.Equals(name)); 
-      return response != null;
+      return response is not null;
     }
     catch(Exception ex) 
     {
