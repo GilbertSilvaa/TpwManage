@@ -32,7 +32,7 @@ public abstract class RepositoryBase<T>(MyContext context) :
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Id.Equals(id));
       return response;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -47,7 +47,7 @@ public abstract class RepositoryBase<T>(MyContext context) :
       await _context.SaveChangesAsync();
       return item;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -59,13 +59,13 @@ public abstract class RepositoryBase<T>(MyContext context) :
     try 
     {
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Id.Equals(item.Id));
-      if(response == null) return null;
+      if (response == null) return null;
 
       _context.Entry(response).CurrentValues.SetValues(item);
       await _context.SaveChangesAsync();
       return response;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -77,13 +77,13 @@ public abstract class RepositoryBase<T>(MyContext context) :
     try 
     {
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Id.Equals(id));
-      if(response == null) return false;
+      if (response == null) return false;
 
       _dataSet.Remove(response);
       await _context.SaveChangesAsync();
       return true;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);

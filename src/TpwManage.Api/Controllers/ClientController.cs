@@ -21,7 +21,7 @@ public class ClientController(IClientService service) : ControllerBase
       var response = await _service.GetAll();
       return Ok(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
@@ -36,10 +36,9 @@ public class ClientController(IClientService service) : ControllerBase
     try 
     {
       var response = await _service.GetById(id);      
-
       return response == null ? NotFound() : Ok(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
@@ -56,7 +55,7 @@ public class ClientController(IClientService service) : ControllerBase
       var linkRedirect = Url.Link("GetClientById", new { id =  response.Id})!;
       return Created(new Uri(linkRedirect), response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }  
@@ -69,11 +68,10 @@ public class ClientController(IClientService service) : ControllerBase
 
     try 
     {
-      var response = await _service.Update(model);
-      
+      var response = await _service.Update(model);  
       return response == null ? NotFound() : Ok(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
@@ -88,10 +86,9 @@ public class ClientController(IClientService service) : ControllerBase
     try 
     {
       var response = await _service.Delete(id);
-      
       return !response ? NotFound() : Ok("Cliente deletado com sucesso.");
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }

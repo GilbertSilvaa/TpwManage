@@ -53,7 +53,7 @@ public class SellingService(
         ?? throw new ClientNotFoundException();
 
       List<Product> productList = [];
-      foreach(var productId in model.ProductsId)
+      foreach (var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
         if (product is null) continue;

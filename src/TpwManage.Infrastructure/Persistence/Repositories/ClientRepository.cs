@@ -15,7 +15,7 @@ public class ClientRepository(MyContext context) :
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Name.Equals(name)); 
       return response is not null;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);

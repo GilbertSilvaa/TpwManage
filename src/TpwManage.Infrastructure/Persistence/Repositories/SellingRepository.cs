@@ -19,7 +19,7 @@ public class SellingRepository(MyContext context) :
         
       return response;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -37,7 +37,7 @@ public class SellingRepository(MyContext context) :
 
       return response;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -49,7 +49,7 @@ public class SellingRepository(MyContext context) :
     try 
     {
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Id.Equals(selling.Id));
-      if(response == null) return null;
+      if (response == null) return null;
 
       response.ClearProducts();
       response.SetupProducts(selling.Products);
@@ -58,7 +58,7 @@ public class SellingRepository(MyContext context) :
       await _context.SaveChangesAsync();
       return response;
     }
-    catch(Exception ex) 
+    catch (Exception ex) 
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);

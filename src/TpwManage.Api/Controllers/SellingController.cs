@@ -15,13 +15,13 @@ public class SellingController(ISellingService service) : ControllerBase
   public async Task<IActionResult> GetAll() 
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
-
+    
     try 
     {
       var response = await _service.GetAll();
       return Ok(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
@@ -36,10 +36,9 @@ public class SellingController(ISellingService service) : ControllerBase
     try 
     {
       var response = await _service.GetById(id);
-
       return response == null ? NotFound() : Ok(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
@@ -56,7 +55,7 @@ public class SellingController(ISellingService service) : ControllerBase
       var linkRedirect = Url.Link("GetSellingById", new { id = response.Id })!;
       return Created(new Uri(linkRedirect), response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }  
@@ -70,10 +69,9 @@ public class SellingController(ISellingService service) : ControllerBase
     try 
     {
       var response = await _service.Update(model);
-      
       return response == null ? NotFound() : Ok(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
@@ -87,11 +85,10 @@ public class SellingController(ISellingService service) : ControllerBase
 
     try 
     {
-      var response = await _service.Delete(id);
-      
+      var response = await _service.Delete(id); 
       return !response ? NotFound() : Ok("Venda deletada com sucesso.");
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
     }
