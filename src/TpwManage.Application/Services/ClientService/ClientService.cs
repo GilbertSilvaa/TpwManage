@@ -1,5 +1,6 @@
 using TpwManage.Application.InputModels;
 using TpwManage.Application.ViewModels;
+using TpwManage.Core;
 using TpwManage.Core.Repositories;
 
 namespace TpwManage.Application.Services.ClientService;
@@ -15,7 +16,7 @@ public class ClientService(IClientRepository repository) : IClientService
       var response = await _repository.GetAllAsync();
       return [.. response.Select(ClientViewModel.FromEntity).OrderBy(c => c.Name)];
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -26,11 +27,11 @@ public class ClientService(IClientRepository repository) : IClientService
     try 
     {
       var response = await _repository.GetByIdAsync(id) 
-        ?? throw new KeyNotFoundException("Cliente não encontrado.");
+        ?? throw new ClientNotFoundException();
         
       return ClientViewModel.FromEntity(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -43,13 +44,13 @@ public class ClientService(IClientRepository repository) : IClientService
       var client = model.ToEntity();     
       var clientExists = await _repository.ExistsAsync(client.Name);
       
-      if(clientExists)    
+      if (clientExists)    
         throw new InvalidOperationException("Já existe um cliente com esse nome.");
 
       var response = await _repository.CreateAsync(client);
       return ClientViewModel.FromEntity(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -60,11 +61,11 @@ public class ClientService(IClientRepository repository) : IClientService
     try 
     {
       var response = await _repository.UpdateAsync(model.ToEntity()) 
-        ?? throw new KeyNotFoundException("Cliente não encontrado.");
+        ?? throw new ClientNotFoundException();
 
       return ClientViewModel.FromEntity(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -77,7 +78,7 @@ public class ClientService(IClientRepository repository) : IClientService
       var response = await _repository.DeleteAsync(id);
       return response;
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }

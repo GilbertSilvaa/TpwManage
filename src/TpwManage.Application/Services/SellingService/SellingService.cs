@@ -1,5 +1,6 @@
 using TpwManage.Application.InputModels;
 using TpwManage.Application.ViewModels;
+using TpwManage.Core;
 using TpwManage.Core.Entities;
 using TpwManage.Core.Repositories;
 
@@ -23,7 +24,7 @@ public class SellingService(
       return [.. response.Select(SellingViewModel.FromEntity)
         .OrderByDescending(s => s.DateSale)];
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -34,11 +35,11 @@ public class SellingService(
     try 
     {
       var response = await _sellingRepository.GetByIdAsync(id) 
-        ?? throw new KeyNotFoundException("Venda não encontrada.");   
+        ?? throw new SellingNotFoundException();  
 
       return SellingViewModel.FromEntity(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -49,16 +50,16 @@ public class SellingService(
     try
     {
       var client = await _clientRepository.GetByIdAsync(model.ClientId)
-        ?? throw new KeyNotFoundException("Cliente não encontrado.");
+        ?? throw new ClientNotFoundException();
 
       List<Product> productList = [];
       foreach(var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product is null) continue;
+        if (product is null) continue;
         
         var stockExists = await ChangeAmountProductStock(product, -1);
-        if(stockExists) productList.Add(product);
+        if (stockExists) productList.Add(product);
       }
 
       Selling selling = new()
@@ -71,7 +72,7 @@ public class SellingService(
       var response = await _sellingRepository.CreateAsync(selling);
       return SellingViewModel.FromEntity(response);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -82,19 +83,19 @@ public class SellingService(
     try
     {
       var selling = await _sellingRepository.GetByIdAsync(model.Id)
-        ?? throw new KeyNotFoundException("Venda não encontrada.");
+        ?? throw new SellingNotFoundException();
       
       foreach (var product in selling.Products)
         await ChangeAmountProductStock(product, 1);   
       
       List<Product> productList = [];
-      foreach(var productId in model.ProductsId)
+      foreach (var productId in model.ProductsId)
       {
         var product = await _productRepository.GetByIdAsync(productId);
-        if(product is null) continue;    
+        if (product is null) continue;    
 
         var stockExists = await ChangeAmountProductStock(product, -1);
-        if(stockExists) productList.Add(product);
+        if (stockExists) productList.Add(product);
       }
 
       Selling sellingUpdate = new()
@@ -109,7 +110,7 @@ public class SellingService(
       var response = await _sellingRepository.UpdateAsync(sellingUpdate);
       return SellingViewModel.FromEntity(response!);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -122,7 +123,7 @@ public class SellingService(
       var response = await _sellingRepository.DeleteAsync(id);
       return response;
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
@@ -132,13 +133,13 @@ public class SellingService(
   {
     try 
     {
-      if(product.Amount == 0) return false;
+      if (product.Amount == 0) return false;
       
       product.Amount += amount;
       var response = await _productRepository.UpdateAsync(product);      
       return response is not null;
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       throw new Exception(ex.Message);
     }
