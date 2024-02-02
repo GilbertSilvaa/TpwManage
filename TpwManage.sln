@@ -13,13 +13,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TpwManage.Application", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TpwManage.Api", "src\TpwManage.Api\TpwManage.Api.csproj", "{C54EB766-2AD3-4A69-B258-D6C0EDFDCA16}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E54CE040-6EEC-488D-BCE4-0CCA0FAA119B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TpwManage.Infrastructure.Tests", "test\TpwManage.Infrastructure.Tests\TpwManage.Infrastructure.Tests.csproj", "{F4B257DA-4799-4033-9B80-89FA53ECFD20}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EF55ED89-A567-416C-9872-56C93E4E1429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -38,11 +39,19 @@ Global
 		{C54EB766-2AD3-4A69-B258-D6C0EDFDCA16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C54EB766-2AD3-4A69-B258-D6C0EDFDCA16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C54EB766-2AD3-4A69-B258-D6C0EDFDCA16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4B257DA-4799-4033-9B80-89FA53ECFD20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4B257DA-4799-4033-9B80-89FA53ECFD20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4B257DA-4799-4033-9B80-89FA53ECFD20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4B257DA-4799-4033-9B80-89FA53ECFD20}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EF55ED89-A567-416C-9872-56C93E4E1429} = {979A6DDA-B063-42FC-8085-E62E103FAF99}
 		{7993BA7A-FBEF-4B2C-AC17-761A4C4F052C} = {979A6DDA-B063-42FC-8085-E62E103FAF99}
 		{BB84EDF2-5338-4C48-B6D3-4F39AA499A60} = {979A6DDA-B063-42FC-8085-E62E103FAF99}
 		{C54EB766-2AD3-4A69-B258-D6C0EDFDCA16} = {979A6DDA-B063-42FC-8085-E62E103FAF99}
+		{F4B257DA-4799-4033-9B80-89FA53ECFD20} = {E54CE040-6EEC-488D-BCE4-0CCA0FAA119B}
 	EndGlobalSection
 EndGlobal
