@@ -6,7 +6,8 @@ using TpwManage.Infrastructure.Persistence.Context;
 namespace TpwManage.Infrastructure.Persistence.Repositories;
 
 public class ProductRepository(MyContext context) : 
-  RepositoryBase<Product>(context), IProductRepository
+  RepositoryBase<Product>(context), 
+  IProductRepository
 {
   public async Task<bool> ExistsAsync(string name, string color)
   {

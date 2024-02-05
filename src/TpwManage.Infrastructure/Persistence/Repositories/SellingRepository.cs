@@ -6,7 +6,8 @@ using TpwManage.Infrastructure.Persistence.Context;
 namespace TpwManage.Infrastructure.Persistence.Repositories;
 
 public class SellingRepository(MyContext context) : 
-  RepositoryBase<Selling>(context), ISellingRepository
+  RepositoryBase<Selling>(context), 
+  ISellingRepository
 {
   public override async Task<List<Selling>> GetAllAsync()
   {

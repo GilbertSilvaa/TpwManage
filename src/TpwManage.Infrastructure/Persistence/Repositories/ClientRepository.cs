@@ -6,7 +6,8 @@ using TpwManage.Infrastructure.Persistence.Context;
 namespace TpwManage.Infrastructure.Persistence.Repositories;
 
 public class ClientRepository(MyContext context) : 
-  RepositoryBase<Client>(context), IClientRepository 
+  RepositoryBase<Client>(context), 
+  IClientRepository 
 {
   public async Task<bool> ExistsAsync(string name)
   {
