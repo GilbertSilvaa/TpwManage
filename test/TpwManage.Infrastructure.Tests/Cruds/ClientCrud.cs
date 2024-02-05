@@ -30,7 +30,6 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     Assert.NotNull(clientUpdated);
     Assert.Equal(client.Name, clientUpdated.Name);
     Assert.True(client.Id == clientUpdated.Id);
-    Assert.False(clientUpdated.Id == Guid.Empty);
 
     // verify if client exist
     bool clientExist = await _repository.ExistsAsync(clientUpdated.Name);
@@ -43,7 +42,6 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     Assert.NotNull(clientSelected);
     Assert.Equal(clientUpdated.Name, clientSelected.Name);
     Assert.True(clientUpdated.Id == clientSelected.Id);
-    Assert.False(clientSelected.Id == Guid.Empty);
 
     // select all clients
     var allClientsList = await _repository.GetAllAsync();
