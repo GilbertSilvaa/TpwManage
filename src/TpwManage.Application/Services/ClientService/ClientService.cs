@@ -75,8 +75,7 @@ public class ClientService(IClientRepository repository) : IClientService
   {
     try 
     {
-      var response = await _repository.DeleteAsync(id);
-      return response;
+      return await _repository.DeleteAsync(id);
     }
     catch (Exception ex)
     {

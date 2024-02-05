@@ -120,8 +120,7 @@ public class SellingService(
   {
     try 
     {
-      var response = await _sellingRepository.DeleteAsync(id);
-      return response;
+      return await _sellingRepository.DeleteAsync(id);
     }
     catch (Exception ex)
     {
