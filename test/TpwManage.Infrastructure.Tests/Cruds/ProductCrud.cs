@@ -33,6 +33,7 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     product.Color = Faker.Name.Last();
     product.Price = Faker.RandomNumber.Next();
     product.Amount = Faker.RandomNumber.Next();
+
     var productUpdated = await _repository.UpdateAsync(product);
     Assert.NotNull(productUpdated);
     Assert.Equal(product.Name, productUpdated.Name);
@@ -43,6 +44,7 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     // verify if product exist
     bool productExist = await _repository.ExistsAsync(productUpdated.Name, productUpdated.Color);
     Assert.True(productExist);
+
     productExist = await _repository.ExistsAsync(Faker.Name.First(), Faker.Name.Last());
     Assert.False(productExist);
 

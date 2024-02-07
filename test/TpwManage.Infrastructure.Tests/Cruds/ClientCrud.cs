@@ -26,6 +26,7 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
 
     // update client
     client.Name = Faker.Name.FullName();
+
     var clientUpdated = await _repository.UpdateAsync(client);
     Assert.NotNull(clientUpdated);
     Assert.Equal(client.Name, clientUpdated.Name);
@@ -34,7 +35,8 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     // verify if client exist
     bool clientExist = await _repository.ExistsAsync(clientUpdated.Name);
     Assert.True(clientExist);
-    clientExist= await _repository.ExistsAsync(Faker.Name.FullName());
+
+    clientExist = await _repository.ExistsAsync(Faker.Name.FullName());
     Assert.False(clientExist);
 
     // select client by Id
