@@ -10,53 +10,111 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
   private readonly ServiceProvider _serviceProvider = db.ServiceProvider;
 
   [Fact]
-  public async Task IsPossibleCrudClient()
+  public async Task IsPossibleCreateClient()
   {
     using var context = _serviceProvider.GetService<MyContext>();
     ClientRepository _repository = new(context!);
 
     Client client = new(Faker.Name.FullName());
-
-    // create client
     Client clientCreated = await _repository.CreateAsync(client);
+
     Assert.NotNull(clientCreated);
     Assert.Equal(client.Id, clientCreated.Id);
     Assert.Equal(client.Name, clientCreated.Name);
     Assert.False(clientCreated.Id == Guid.Empty);
+  }
 
-    // update client
+  [Fact]
+  public async Task IsPossibleSelectAllClients()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
+
+    await _repository.CreateAsync(new(Faker.Name.FullName()));
+    var clientList = await _repository.GetAllAsync();
+
+    Assert.NotNull(clientList);
+    Assert.True(clientList.Count > 0);
+  }
+
+  [Fact]
+  public async Task IsPossibleSelectClientById()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
+
+    var client = await _repository.CreateAsync(new(Faker.Name.FullName()));
+    var clientSelected = await _repository.GetByIdAsync(client.Id);
+
+    Assert.NotNull(clientSelected); 
+    Assert.Equal(client.Name, clientSelected.Name);
+    Assert.Equal(client.Id, clientSelected.Id);
+  }
+
+  [Fact]
+  public async Task IsPossibleUpdateClient()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
+
+    var client = await _repository.CreateAsync(new(Faker.Name.FullName()));
     client.Name = Faker.Name.FullName();
-
     var clientUpdated = await _repository.UpdateAsync(client);
+
     Assert.NotNull(clientUpdated);
     Assert.Equal(client.Name, clientUpdated.Name);
     Assert.Equal(client.Id, clientUpdated.Id);
+  }
 
-    // verify if client exist
-    bool clientExist = await _repository.ExistsAsync(clientUpdated.Name);
+  [Fact]
+  public async Task IsPossibleVerifyIfClientExist()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
+
+    var client = await _repository.CreateAsync(new(Faker.Name.FullName()));
+    bool clientExist = await _repository.ExistsAsync(client.Name);
+
     Assert.True(clientExist);
+  }
 
-    clientExist = await _repository.ExistsAsync(Faker.Name.FullName());
+  [Fact]
+  public async Task IsPossibleVerifyIfClientNotExist()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
+
+    bool clientExist = await _repository.ExistsAsync(Faker.Name.FullName());
+
     Assert.False(clientExist);
+  }
 
-    // select client by Id
-    var clientSelected = await _repository.GetByIdAsync(clientUpdated.Id);
-    Assert.NotNull(clientSelected);
-    Assert.Equal(clientUpdated.Name, clientSelected.Name);
-    Assert.Equal(clientUpdated.Id, clientSelected.Id);
+  [Fact]
+  public async Task IsPossibleDeleteClient()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
 
-    // select all clients
-    var allClientsList = await _repository.GetAllAsync();
-    Assert.NotNull(allClientsList);
-    Assert.True(allClientsList.Count > 0);
+    var client = await _repository.CreateAsync(new(Faker.Name.FullName()));
+    bool isDeleted = await _repository.DeleteAsync(client.Id);
 
-    // delete client
-    bool isDeleted = await _repository.DeleteAsync(clientSelected.Id);
     Assert.True(isDeleted);
+  }
 
-    // select empty client list
-    allClientsList = await _repository.GetAllAsync();
-    Assert.NotNull(allClientsList);
-    Assert.True(allClientsList.Count == 0);
+  [Fact]
+  public async Task IsPossibleSelectEmptyClientList()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ClientRepository _repository = new(context!);
+
+    var clientList = await _repository.GetAllAsync();
+
+    foreach (var client in clientList)
+      await _repository.DeleteAsync(client.Id);
+
+    var emptyClientList = await _repository.GetAllAsync();
+
+    Assert.NotNull(emptyClientList);
+    Assert.Empty(emptyClientList);
   }
 }
