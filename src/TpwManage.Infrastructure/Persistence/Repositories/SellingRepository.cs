@@ -52,6 +52,7 @@ public class SellingRepository(MyContext context) :
       var response = await _dataSet.SingleOrDefaultAsync(r => r.Id.Equals(selling.Id));
       if (response == null) return null;
 
+      response.Client = selling.Client;
       response.ClearProducts();
       response.SetupProducts(selling.Products);
 
