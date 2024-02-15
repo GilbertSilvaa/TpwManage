@@ -62,9 +62,9 @@ public class SellingService(
         if (stockExists) productList.Add(product);
       }
 
-      Selling selling = new()
-      {
-        Client = client
+      Selling selling = new() 
+      { 
+        Client = client 
       };
 
       selling.SetupProducts(productList);
