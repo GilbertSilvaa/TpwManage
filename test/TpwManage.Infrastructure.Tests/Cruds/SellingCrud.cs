@@ -13,16 +13,18 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
   public async Task IsPossibleCrudSelling()
   {
     using var context = _serviceProvider.GetService<MyContext>();
-    SellingRepository _repository = new(context!);
+    SellingRepository _sellingRepository = new(context!);
+    ProductRepository _productRepository = new(context!);
+    ClientRepository _clientRepository = new(context!);
     Selling selling = new() 
     { 
-      Client = new(Faker.Name.FullName())
+      Client = await GenerateClient(_clientRepository)
     };
 
-    selling.SetupProducts(GenerateProductList());
+    selling.SetupProducts(await GenerateProductList(_productRepository));
 
     // create selling
-    Selling sellingCreated = await _repository.CreateAsync(selling);
+    Selling sellingCreated = await _sellingRepository.CreateAsync(selling);
     Assert.NotNull(sellingCreated);
     Assert.Equal(sellingCreated.Client, selling.Client);
     Assert.Equal(sellingCreated.Products, selling.Products);
@@ -35,12 +37,12 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     Selling sellingUpdate = new()
     {
       Id = sellingCreated.Id,
-      Client = new(Faker.Name.FullName()),
+      Client = await GenerateClient(_clientRepository),
       CreateAt = sellingCreated.CreateAt  
     };
-    sellingUpdate.SetupProducts(GenerateProductList());
+    sellingUpdate.SetupProducts(await GenerateProductList(_productRepository));
 
-    var sellingUpdated = await _repository.UpdateAsync(sellingUpdate);
+    var sellingUpdated = await _sellingRepository.UpdateAsync(sellingUpdate);
     Assert.NotNull(sellingUpdated);
     Assert.Equal(sellingUpdated.Id, sellingUpdate.Id);
     Assert.Equal(sellingUpdated.Client, sellingUpdate.Client);
@@ -51,7 +53,7 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     Assert.False(sellingUpdated.Products.Count == 0);
 
     // select selling by Id
-    var sellingSelected = await _repository.GetByIdAsync(sellingUpdated.Id);
+    var sellingSelected = await _sellingRepository.GetByIdAsync(sellingUpdated.Id);
     Assert.NotNull(sellingSelected);
     Assert.Equal(sellingSelected.Id, sellingUpdated.Id);
     Assert.Equal(sellingSelected.Client, sellingUpdated.Client);
@@ -61,16 +63,16 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     Assert.False(sellingSelected.Products.Count == 0);
 
     // select all sellings
-    var allSellingsList = await _repository.GetAllAsync();
+    var allSellingsList = await _sellingRepository.GetAllAsync();
     Assert.NotNull(allSellingsList);
     Assert.True(allSellingsList.Count > 0);
 
     // delete selling
-    bool isDeleted = await _repository.DeleteAsync(sellingUpdated.Id);
+    bool isDeleted = await _sellingRepository.DeleteAsync(sellingUpdated.Id);
     Assert.True(isDeleted);
 
     // select empty selling list
-    allSellingsList = await _repository.GetAllAsync();
+    allSellingsList = await _sellingRepository.GetAllAsync();
     Assert.NotNull(allSellingsList);
     Assert.Empty(allSellingsList);
   }
@@ -94,4 +96,7 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
 
     return products;
   }
+
+  private static async Task<Client> GenerateClient(ClientRepository repository)
+    => await repository.CreateAsync(new(Faker.Name.FullName()));
 }
