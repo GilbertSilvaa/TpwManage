@@ -10,65 +10,123 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
   private readonly ServiceProvider _serviceProvider = db.ServiceProvider;
 
   [Fact]
-  public async Task IsPossibleCrudProduct()
+  public async Task IsPossible_CreateProduct()
   {
     using var context = _serviceProvider.GetService<MyContext>();
     ProductRepository _repository = new(context!);
 
     Product product = new(
-      name: Faker.Name.First(), 
-      color: Faker.Name.Last(), 
-      price: Faker.RandomNumber.Next(), 
-      amount: Faker.RandomNumber.Next());
+      name: Faker.Name.First(),
+      color: Faker.Name.Last(),
+      price: Faker.RandomNumber.Next(),
+      amount: Faker.RandomNumber.Next()); 
 
-    // create product
     Product productCreated = await _repository.CreateAsync(product);
-    Assert.NotNull(productCreated);
-    Assert.Equal(product.Id, productCreated.Id);
-    Assert.Equal(product.Name, productCreated.Name);
-    Assert.False(productCreated.Id == Guid.Empty);
 
-    // update product
-    product.Name = Faker.Name.First();
-    product.Color = Faker.Name.Last();
-    product.Price = Faker.RandomNumber.Next();
-    product.Amount = Faker.RandomNumber.Next();
+    Assert.Equal(product, productCreated);
+  }
 
+  [Fact]
+  public async Task IsPossible_SelectAllProducts()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
+
+    await GetOneProductAsync(_repository);
+    var productList = await _repository.GetAllAsync();
+
+    Assert.True(productList.Count > 0);
+  }
+
+  [Fact]
+  public async Task IsPossible_SelectProductById()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
+
+    var product = await GetOneProductAsync(_repository);
+    var productSelected = await _repository.GetByIdAsync(product.Id);
+
+    Assert.Equal(product, productSelected);
+  }
+
+  [Fact]
+  public async Task IsPossible_UpdateProduct()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
+
+    var product = await GetOneProductAsync(_repository);
+    product.Name = Faker.Name.FullName();
     var productUpdated = await _repository.UpdateAsync(product);
-    Assert.NotNull(productUpdated);
-    Assert.Equal(product.Name, productUpdated.Name);
-    Assert.Equal(product.Color, productUpdated.Color);
-    Assert.Equal(product.Price, productUpdated.Price);
-    Assert.Equal(product.Amount, productUpdated.Amount);
 
-    // verify if product exist
-    bool productExist = await _repository.ExistsAsync(productUpdated.Name, productUpdated.Color);
+    Assert.Equal(product, productUpdated);
+  }
+
+  [Fact]
+  public async Task IsPossible_VerifyIfProductExist()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
+
+    var product = await GetOneProductAsync(_repository);
+    bool productExist = await _repository.ExistsAsync(product.Name, product.Color);
+
     Assert.True(productExist);
+  }
 
-    productExist = await _repository.ExistsAsync(Faker.Name.First(), Faker.Name.Last());
+  [Fact]
+  public async Task IsPossible_VerifyIfProductNotExist()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
+
+    bool productExist = await _repository
+      .ExistsAsync(Faker.Name.FullName(), Faker.Name.Last());
+
     Assert.False(productExist);
+  }
 
-    // select product by Id
-    var productSelected = await _repository.GetByIdAsync(productUpdated.Id);
-    Assert.NotNull(productSelected);
-    Assert.Equal(productUpdated.Name, productSelected.Name);
-    Assert.Equal(productUpdated.Color, productSelected.Color);
-    Assert.Equal(productUpdated.Price, productSelected.Price);
-    Assert.Equal(productUpdated.Amount, productSelected.Amount);
-    Assert.Equal(productUpdated.Id, productSelected.Id);
+  [Fact]
+  public async Task IsPossible_DeleteProduct()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
 
-    // select all products
-    var allProductsList = await _repository.GetAllAsync();
-    Assert.NotNull(allProductsList);
-    Assert.True(allProductsList.Count > 0);
+    var product = await GetOneProductAsync(_repository);
+    bool isDeleted = await _repository.DeleteAsync(product.Id);
 
-    // delete product
-    bool isDeleted = await _repository.DeleteAsync(productSelected.Id);
     Assert.True(isDeleted);
+  }
 
-    // select empty product list
-    allProductsList = await _repository.GetAllAsync();
-    Assert.NotNull(allProductsList);
-    Assert.True(allProductsList.Count == 0);
+  [Fact]
+  public async Task IsPossible_SelectEmptyProductList()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    ProductRepository _repository = new(context!);
+
+    await RemoveAllProductsAsync(_repository);
+    var emptyProductList = await _repository.GetAllAsync();
+
+    Assert.Empty(emptyProductList);
+  }
+
+  private static async Task<Product> GetOneProductAsync(ProductRepository repository)
+  {
+    var productList = await repository.GetAllAsync();
+
+    if (productList.Count > 0) return productList.First();
+
+    return await repository.CreateAsync(new(
+      name: Faker.Name.First(),
+      color: Faker.Name.Last(),
+      price: Faker.RandomNumber.Next(),
+      amount: Faker.RandomNumber.Next()));
+  }
+
+  private static async Task RemoveAllProductsAsync(ProductRepository repository)
+  {
+    foreach (var product in (await repository.GetAllAsync()))
+      await repository.DeleteAsync(product.Id);
   }
 }
