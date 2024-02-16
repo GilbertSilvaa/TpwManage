@@ -10,79 +10,106 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
   private readonly ServiceProvider _serviceProvider = db.ServiceProvider;
 
   [Fact]
-  public async Task IsPossibleCrudSelling()
+  public async Task IsPossible_CreateSelling()
   {
     using var context = _serviceProvider.GetService<MyContext>();
     SellingRepository _sellingRepository = new(context!);
-    ProductRepository _productRepository = new(context!);
-    ClientRepository _clientRepository = new(context!);
-    Selling selling = new() 
-    { 
-      Client = await GenerateClient(_clientRepository)
-    };
 
-    selling.SetupProducts(await GenerateProductList(_productRepository));
-
-    // create selling
-    Selling sellingCreated = await _sellingRepository.CreateAsync(selling);
-    Assert.NotNull(sellingCreated);
-    Assert.Equal(sellingCreated.Client, selling.Client);
-    Assert.Equal(sellingCreated.Products, selling.Products);
-    Assert.Equal(sellingCreated.TotalPrice, selling.TotalPrice);
-    Assert.True(sellingCreated.Products.Count == selling.Products.Count);
-    Assert.False(sellingCreated.Products.Count == 0);
-    Assert.NotEqual(sellingCreated.Id, Guid.Empty);
-
-    // update selling
-    Selling sellingUpdate = new()
+    Selling selling = new()
     {
-      Id = sellingCreated.Id,
-      Client = await GenerateClient(_clientRepository),
-      CreateAt = sellingCreated.CreateAt  
+      Client = await GenerateClientAsync(new(context!))
     };
-    sellingUpdate.SetupProducts(await GenerateProductList(_productRepository));
+    selling.SetupProducts(await GenerateProductListAsync(new(context!)));
+    Selling sellingCreated = await _sellingRepository.CreateAsync(selling);
 
-    var sellingUpdated = await _sellingRepository.UpdateAsync(sellingUpdate);
-    Assert.NotNull(sellingUpdated);
-    Assert.Equal(sellingUpdated.Id, sellingUpdate.Id);
-    Assert.Equal(sellingUpdated.Client, sellingUpdate.Client);
-    Assert.Equal(sellingUpdated.Products, sellingUpdate.Products);
-    Assert.Equal(sellingUpdated.TotalPrice, sellingUpdate.TotalPrice);
-    Assert.Equal(sellingUpdated.CreateAt, sellingUpdate.CreateAt);
-    Assert.True(sellingUpdated.Products.Count == sellingUpdate.Products.Count);
-    Assert.False(sellingUpdated.Products.Count == 0);
+    Assert.Equal(selling, sellingCreated);
+  }
+  
+  [Fact]
+  public async Task IsPossible_SelectAllSellings()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    SellingRepository _sellingRepository = new(context!);
 
-    // select selling by Id
-    var sellingSelected = await _sellingRepository.GetByIdAsync(sellingUpdated.Id);
-    Assert.NotNull(sellingSelected);
-    Assert.Equal(sellingSelected.Id, sellingUpdated.Id);
-    Assert.Equal(sellingSelected.Client, sellingUpdated.Client);
-    Assert.Equal(sellingSelected.Products, sellingUpdated.Products);
-    Assert.Equal(sellingSelected.TotalPrice, sellingUpdated.TotalPrice);
-    Assert.True(sellingSelected.Products.Count == sellingUpdated.Products.Count);
-    Assert.False(sellingSelected.Products.Count == 0);
-
-    // select all sellings
+    await GetOneSellingAsync(context!);
     var allSellingsList = await _sellingRepository.GetAllAsync();
-    Assert.NotNull(allSellingsList);
+
     Assert.True(allSellingsList.Count > 0);
-
-    // delete selling
-    bool isDeleted = await _sellingRepository.DeleteAsync(sellingUpdated.Id);
-    Assert.True(isDeleted);
-
-    // select empty selling list
-    allSellingsList = await _sellingRepository.GetAllAsync();
-    Assert.NotNull(allSellingsList);
-    Assert.Empty(allSellingsList);
   }
 
-  private static async Task<List<Product>> GenerateProductList(ProductRepository repository)
+  [Fact]
+  public async Task IsPossible_SelectSellingById()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    SellingRepository _sellingRepository = new(context!);
+
+    var selling = await GetOneSellingAsync(context!);
+    var sellingSelected = await _sellingRepository.GetByIdAsync(selling.Id);
+
+    Assert.Equal(selling, sellingSelected);
+  }
+
+  [Fact]
+  public async Task IsPossible_UpdateSelling()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    SellingRepository _sellingRepository = new(context!);
+
+    var selling = await GetOneSellingAsync(context!);
+    selling.Client = await GenerateClientAsync(new(context!));
+    selling.ClearProducts();
+    selling.SetupProducts(await GenerateProductListAsync(new(context!)));
+    var sellingUpdated = await _sellingRepository.UpdateAsync(selling);
+
+    Assert.Equal(selling, sellingUpdated);
+  }
+
+  [Fact]
+  public async Task IsPossible_DeleteSelling()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    SellingRepository _sellingRepository = new(context!);
+
+    var selling = await GetOneSellingAsync(context!);
+    var isDeleted = await _sellingRepository.DeleteAsync(selling.Id);
+
+    Assert.True(isDeleted);
+  }
+  
+  [Fact]
+  public async Task IsPossible_SelectEmptySellingList()
+  {
+    using var context = _serviceProvider.GetService<MyContext>();
+    SellingRepository _sellingRepository = new(context!);
+
+    await RemoveAllSellingsAsync(_sellingRepository);
+    var emptyClientList = await _sellingRepository.GetAllAsync();
+
+    Assert.Empty(emptyClientList);
+  }
+
+  private static async Task<Selling> GetOneSellingAsync(MyContext context)
+  {
+    SellingRepository repository = new(context!);
+    var sellingList = await repository.GetAllAsync();
+
+    if (sellingList.Count > 0) return sellingList.First();
+
+    Selling selling = new()
+    {
+      Client = await GenerateClientAsync(new(context!))
+    };
+    selling.SetupProducts(await GenerateProductListAsync(new(context!)));
+
+    return await repository.CreateAsync(selling);
+  }
+
+  private static async Task<List<Product>> GenerateProductListAsync(ProductRepository repository)
   {
     List<Product> products = [];
     Random random = new();
 
-    foreach (var _ in Enumerable.Range(1, 9))
+    foreach (var _ in Enumerable.Range(0, 8))
     {
       Product product = new(
         name: Faker.Name.First(),
@@ -97,6 +124,12 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     return products;
   }
 
-  private static async Task<Client> GenerateClient(ClientRepository repository)
+  private static async Task<Client> GenerateClientAsync(ClientRepository repository)
     => await repository.CreateAsync(new(Faker.Name.FullName()));
+
+  private static async Task RemoveAllSellingsAsync(SellingRepository repository)
+  {
+    foreach (var selling in (await repository.GetAllAsync()))
+      await repository.DeleteAsync(selling.Id);
+  }
 }
