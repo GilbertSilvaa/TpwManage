@@ -2,6 +2,7 @@ namespace TpwManage.Core.Entities;
 
 public class Selling : EntityBase
 {
+  public Guid ClientId { get; set; }
   public Client Client { get; set; } = default!;
   public List<Product> Products { get; private set; } = [];
   public float TotalPrice { get; private set; } = 0;
@@ -14,5 +15,9 @@ public class Selling : EntityBase
     }
   }
 
-  public void ClearProducts() => Products.Clear();
+  public void ClearProducts()
+  {
+    TotalPrice = 0;
+    Products.Clear();
+  }
 }
