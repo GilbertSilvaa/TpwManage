@@ -9,16 +9,17 @@ public class SellingRepository(MyContext context) :
   RepositoryBase<Selling>(context), 
   ISellingRepository
 {
+  private readonly ClientRepository _clientRepository = new(context);
+  private readonly ProductRepository _productRepository = new(context);
+
   public override async Task<List<Selling>> GetAllAsync()
   {
     try 
     {
-      var response = await _dataSet
-        .Include(s => s.Products)
-        .Include(s => s.Client)
-        .ToListAsync();
-        
-      return response;
+      var response = await DapperContext
+        .ExecuteQueryAsync<Selling>("SELECT * FROM Sellings");
+
+      return await LoadClientProductsInSellings(response);
     }
     catch (Exception ex) 
     {
@@ -31,12 +32,10 @@ public class SellingRepository(MyContext context) :
   {
     try 
     {
-      var response = await _dataSet
-        .Include(s => s.Products)
-        .Include(s => s.Client)
-        .SingleOrDefaultAsync(r => r.Id.Equals(id));
+      var response = await DapperContext
+        .ExecuteQueryAsync<Selling>($"SELECT * FROM Sellings WHERE Id = '{id}'");
 
-      return response;
+      return (await LoadClientProductsInSellings(response)).FirstOrDefault();
     }
     catch (Exception ex) 
     {
@@ -65,5 +64,20 @@ public class SellingRepository(MyContext context) :
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
     }
+  }
+
+  private async Task<List<Selling>> LoadClientProductsInSellings(List<Selling> sellings)
+  {
+    List<Selling> sellingsWithClientProducts = [];
+
+    foreach (var s in sellings)
+    {
+      s.Client = await _clientRepository.GetByIdAsync(s.ClientId) ?? new();
+      s.ClearProducts();
+      s.SetupProducts(await _productRepository.GetBySellingId(s.Id));
+      sellingsWithClientProducts.Add(s);
+    };
+
+    return sellingsWithClientProducts;
   }
 }
