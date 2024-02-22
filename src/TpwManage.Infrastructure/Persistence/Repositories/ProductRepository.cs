@@ -10,19 +10,6 @@ public class ProductRepository(MyContext context) :
   RepositoryBase<Product>(context), 
   IProductRepository
 {
-  public override async Task<List<Product>> GetAllAsync()
-  {
-    return await DapperContext.ExecuteQueryAsync<Product>($"SELECT * FROM Products");
-  }
-
-  public override async Task<Product?> GetByIdAsync(Guid id)
-  {
-    var response = await DapperContext
-      .ExecuteQueryAsync<Product>($"SELECT * FROM Products WHERE Id = '{id}'");
-
-    return response.FirstOrDefault();
-  }
-
   public async Task<List<Product>> GetBySellingIdAsync(Guid sellingId)
   {
     var response = await DapperContext
@@ -40,10 +27,10 @@ public class ProductRepository(MyContext context) :
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(r => 
-        r.Name.Equals(name) && r.Color.Equals(color)); 
-        
-      return response is not null;
+      var response = await DapperContext
+        .ExecuteQueryAsync<Product>($"SELECT * FROM Products WHERE Name = '{name}' AND Color = '{color}'");
+
+      return response.FirstOrDefault() is not null;
     }
     catch (Exception ex) 
     {

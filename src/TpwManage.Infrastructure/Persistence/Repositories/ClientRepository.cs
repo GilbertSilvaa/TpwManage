@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using TpwManage.Core.Entities;
 using TpwManage.Core.Repositories;
 using TpwManage.Infrastructure.Persistence.Context;
@@ -9,42 +8,14 @@ public class ClientRepository(MyContext context) :
   RepositoryBase<Client>(context), 
   IClientRepository 
 {
-
-  public override async Task<List<Client>> GetAllAsync()
-  {
-    try
-    {
-      return await DapperContext.ExecuteQueryAsync<Client>($"SELECT * FROM Clients");
-    }
-    catch (Exception ex)
-    {
-      var messageException = ex.InnerException?.Message ?? ex.Message;
-      throw new Exception(messageException);
-    }
-  }
-
-  public override async Task<Client?> GetByIdAsync(Guid id)
-  {
-    try
-    {
-      var response = await DapperContext
-        .ExecuteQueryAsync<Client>($"SELECT * FROM Clients WHERE Id = '{id}'");
-
-      return response.FirstOrDefault();
-    }
-    catch (Exception ex)
-    {
-      var messageException = ex.InnerException?.Message ?? ex.Message;
-      throw new Exception(messageException);
-    }
-  }
-
   public async Task<bool> ExistsAsync(string name)
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(r => r.Name.Equals(name)); 
-      return response is not null;
+      var response = await DapperContext
+        .ExecuteQueryAsync<Client>($"SELECT * FROM Clients WHERE Name = '{name}'");
+
+      return response.FirstOrDefault() is not null;
     }
     catch (Exception ex) 
     {

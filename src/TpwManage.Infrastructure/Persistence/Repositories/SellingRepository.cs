@@ -16,10 +16,7 @@ public class SellingRepository(MyContext context) :
   {
     try 
     {
-      var response = await DapperContext
-        .ExecuteQueryAsync<Selling>("SELECT * FROM Sellings");
-
-      return await LoadClientProductsInSellings(response);
+      return await LoadClientProductsInSellings(await base.GetAllAsync());
     }
     catch (Exception ex) 
     {
@@ -32,10 +29,9 @@ public class SellingRepository(MyContext context) :
   {
     try 
     {
-      var response = await DapperContext
-        .ExecuteQueryAsync<Selling>($"SELECT * FROM Sellings WHERE Id = '{id}'");
+      var response = await LoadClientProductsInSellings([await base.GetByIdAsync(id) ?? new()]);
 
-      return (await LoadClientProductsInSellings(response)).FirstOrDefault();
+      return response.FirstOrDefault();
     }
     catch (Exception ex) 
     {
@@ -49,7 +45,7 @@ public class SellingRepository(MyContext context) :
     try
     {
       var response = await DapperContext
-        .ExecuteQueryAsync<Selling>($"SELECT * FROM Sellings WHERE ClientId = '{clientId}'");
+        .ExecuteQueryAsync<Selling>($@"SELECT * FROM Sellings WHERE ClientId = '{clientId}'");
 
       return await LoadClientProductsInSellings(response);
     }
