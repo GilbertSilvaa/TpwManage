@@ -7,7 +7,7 @@ public class SellingViewModel(
   float totalPrice, 
   DateTime dateSale,
   ClientViewModel client, 
-  List<ProductSellingViewModel>products
+  List<ProductSellingViewModel> products
 )
 {
   public Guid Id { get; set; } = id;
@@ -22,8 +22,7 @@ public class SellingViewModel(
       selling.TotalPrice, 
       selling.CreateAt,
       ClientViewModel.FromEntity(selling.Client), 
-      [.. selling.Products.Select(ProductSellingViewModel.FromEntity)]
-    );
+      [.. selling.Products.Select(ProductSellingViewModel.FromEntity)]);
 }
 
 public class ProductSellingViewModel(Guid id, string name, string color, float price)
@@ -38,6 +37,5 @@ public class ProductSellingViewModel(Guid id, string name, string color, float p
       product.Id, 
       product.Name, 
       product.Color, 
-      product.Price
-    );
+      product.Price);
 }

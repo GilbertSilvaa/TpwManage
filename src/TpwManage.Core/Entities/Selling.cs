@@ -9,7 +9,8 @@ public class Selling : EntityBase
 
   public void SetupProducts(List<Product> products) 
   { 
-    foreach (var product in products) {
+    foreach (var product in products) 
+    {
       TotalPrice += product.Price;
       Products.Add(product);
     }

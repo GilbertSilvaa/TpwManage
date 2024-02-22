@@ -18,8 +18,7 @@ public class SellingController(ISellingService service) : ControllerBase
     
     try 
     {
-      var response = await _service.GetAll();
-      return Ok(response);
+      return Ok(await _service.GetAll());
     }
     catch (Exception ex)
     {
@@ -37,6 +36,22 @@ public class SellingController(ISellingService service) : ControllerBase
     {
       var response = await _service.GetById(id);
       return response == null ? NotFound() : Ok(response);
+    }
+    catch (Exception ex)
+    {
+      return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+    }
+  }
+
+  [HttpGet]
+  [Route("client/{clientId}", Name = "GetSellingByClientId")]
+  public async Task<IActionResult> GetByClientId(Guid clientId)
+  {
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    try
+    {
+      return Ok(await _service.GetByClientId(clientId));
     }
     catch (Exception ex)
     {

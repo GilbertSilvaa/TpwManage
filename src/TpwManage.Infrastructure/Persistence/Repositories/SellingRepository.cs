@@ -44,6 +44,22 @@ public class SellingRepository(MyContext context) :
     }
   }
 
+  public async Task<List<Selling>> GetByClientIdAsync(Guid clientId)
+  {
+    try
+    {
+      var response = await DapperContext
+        .ExecuteQueryAsync<Selling>($"SELECT * FROM Sellings WHERE ClientId = '{clientId}'");
+
+      return await LoadClientProductsInSellings(response);
+    }
+    catch (Exception ex)
+    {
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
+    }
+  }
+
   public override async Task<Selling?> UpdateAsync(Selling selling)
   {
     try 
@@ -74,7 +90,7 @@ public class SellingRepository(MyContext context) :
     {
       s.Client = await _clientRepository.GetByIdAsync(s.ClientId) ?? new();
       s.ClearProducts();
-      s.SetupProducts(await _productRepository.GetBySellingId(s.Id));
+      s.SetupProducts(await _productRepository.GetBySellingIdAsync(s.Id));
       sellingsWithClientProducts.Add(s);
     };
 

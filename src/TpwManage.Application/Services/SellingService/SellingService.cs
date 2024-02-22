@@ -45,6 +45,20 @@ public class SellingService(
     }
   }
   
+  public async Task<List<SellingViewModel>> GetByClientId(Guid clientId)
+  {
+    try
+    {
+      var response = await _sellingRepository.GetByClientIdAsync(clientId);
+      return [.. response.Select(SellingViewModel.FromEntity)
+        .OrderByDescending(s => s.DateSale)];
+    }
+    catch (Exception ex)
+    {
+      throw new Exception(ex.Message);
+    }
+  }
+
   public async Task<SellingViewModel> Create(CreateSellingInputModel model)
   {
     try
