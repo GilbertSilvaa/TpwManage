@@ -11,12 +11,13 @@ public abstract class RepositoryBase<T>(MyContext context) :
   private readonly string? _dbTableName = context.Model.FindEntityType(typeof(T))?.GetTableName();
   protected readonly MyContext _context = context;
   protected readonly DbSet<T> _dataSet = context.Set<T>();
+  protected readonly DapperContext _dapper = new(context);
 
   public virtual async Task<List<T>> GetAllAsync()
   {
     try
     {
-      return await DapperContext.ExecuteQueryAsync<T>($"SELECT * FROM {_dbTableName}");
+      return await _dapper.ExecuteQueryAsync<T>($"SELECT * FROM {_dbTableName}");
     }
     catch (Exception ex)
     {
@@ -29,7 +30,7 @@ public abstract class RepositoryBase<T>(MyContext context) :
   {
     try 
     {
-      return (await DapperContext
+      return (await _dapper
         .ExecuteQueryAsync<T>($"SELECT * FROM {_dbTableName} WHERE Id = '{id}'"))
         .FirstOrDefault();
     }

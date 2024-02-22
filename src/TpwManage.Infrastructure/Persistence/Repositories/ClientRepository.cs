@@ -12,7 +12,7 @@ public class ClientRepository(MyContext context) :
   {
     try 
     {
-      var response = await DapperContext
+      var response = await _dapper
         .ExecuteQueryAsync<Client>($"SELECT * FROM Clients WHERE Name = '{name}'");
 
       return response.FirstOrDefault() is not null;

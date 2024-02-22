@@ -1,14 +1,15 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 
 namespace TpwManage.Infrastructure.Persistence.Context;
 
-public class DapperContext
+public class DapperContext(MyContext context)
 {
-  private static MySqlConnection GetConnection()
-    => new(Environment.GetEnvironmentVariable("CONNECTION"));
+  private MySqlConnection GetConnection()
+    => new(context.Database.GetConnectionString());
 
-  public static async Task<List<T>> ExecuteQueryAsync<T>(string SQL)
+  public async Task<List<T>> ExecuteQueryAsync<T>(string SQL)
   {
     using var connection = GetConnection();
     connection.Open();

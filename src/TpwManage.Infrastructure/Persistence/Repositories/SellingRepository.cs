@@ -44,7 +44,7 @@ public class SellingRepository(MyContext context) :
   {
     try
     {
-      var response = await DapperContext
+      var response = await _dapper
         .ExecuteQueryAsync<Selling>($@"SELECT * FROM Sellings WHERE ClientId = '{clientId}'");
 
       return await LoadClientProductsInSellings(response);

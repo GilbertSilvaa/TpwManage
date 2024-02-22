@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using TpwManage.Core.Entities;
 using TpwManage.Core.Repositories;
 using TpwManage.Infrastructure.Persistence.Context;
@@ -12,7 +11,7 @@ public class ProductRepository(MyContext context) :
 {
   public async Task<List<Product>> GetBySellingIdAsync(Guid sellingId)
   {
-    var response = await DapperContext
+    var response = await _dapper
       .ExecuteQueryAsync<SellingProductDto>($"SELECT * FROM ProductSelling WHERE SellingId = '{sellingId}'");
 
     List<Product> result = [];
@@ -27,7 +26,7 @@ public class ProductRepository(MyContext context) :
   {
     try 
     {
-      var response = await DapperContext
+      var response = await _dapper
         .ExecuteQueryAsync<Product>($"SELECT * FROM Products WHERE Name = '{name}' AND Color = '{color}'");
 
       return response.FirstOrDefault() is not null;
