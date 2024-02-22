@@ -23,7 +23,7 @@ public class ProductRepository(MyContext context) :
     return response.FirstOrDefault();
   }
 
-  public async Task<List<Product>> GetBySellingId(Guid sellingId)
+  public async Task<List<Product>> GetBySellingIdAsync(Guid sellingId)
   {
     var response = await DapperContext
       .ExecuteQueryAsync<SellingProductDto>($"SELECT * FROM ProductSelling WHERE SellingId = '{sellingId}'");
