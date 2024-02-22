@@ -47,7 +47,7 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     var product = await GetOneProductAsync(_repository);
     var productSelected = await _repository.GetByIdAsync(product.Id);
 
-    Assert.Equal(product, productSelected);
+    Assert.Equal(product.ToString(), productSelected?.ToString());
   }
 
   [Fact]
@@ -60,7 +60,7 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     product.Name = Faker.Name.FullName();
     var productUpdated = await _repository.UpdateAsync(product);
 
-    Assert.Equal(product, productUpdated);
+    Assert.Equal(product.ToString(), productUpdated?.ToString());
   }
 
   [Fact]
@@ -114,14 +114,15 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
   private static async Task<Product> GetOneProductAsync(ProductRepository repository)
   {
     var productList = await repository.GetAllAsync();
+    Random random = new();
 
     if (productList.Count > 0) return productList.First();
 
     return await repository.CreateAsync(new(
       name: Faker.Name.First(),
       color: Faker.Name.Last(),
-      price: Faker.RandomNumber.Next(),
-      amount: Faker.RandomNumber.Next()));
+      price: random.Next(20, 80),
+      amount: random.Next(5, 35)));
   }
 
   private static async Task RemoveAllProductsAsync(ProductRepository repository)

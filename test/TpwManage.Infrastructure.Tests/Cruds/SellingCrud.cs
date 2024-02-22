@@ -46,7 +46,7 @@ public class SellingCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     var selling = await GetOneSellingAsync(context!);
     var sellingSelected = await _sellingRepository.GetByIdAsync(selling.Id);
 
-    Assert.Equal(selling, sellingSelected);
+    Assert.Equal(selling.ToString(), sellingSelected?.ToString());
   }
 
   [Fact]

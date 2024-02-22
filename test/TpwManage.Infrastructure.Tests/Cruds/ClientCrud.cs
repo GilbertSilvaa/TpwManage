@@ -42,7 +42,7 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     var client = await GetOneClientAsync(_repository);
     var clientSelected = await _repository.GetByIdAsync(client.Id);
 
-    Assert.Equal(client, clientSelected);
+    Assert.Equal(client.ToString(), clientSelected?.ToString());
   }
 
   [Fact]
