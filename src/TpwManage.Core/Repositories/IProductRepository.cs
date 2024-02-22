@@ -4,6 +4,6 @@ namespace TpwManage.Core.Repositories;
 
 public interface IProductRepository : IRepositoryBase<Product>
 {
-  Task<bool> ExistsAsync(string name, string color);
   Task<List<Product>> GetBySellingIdAsync(Guid sellingId);
+  Task<bool> ExistsAsync(string name, string color);
 }

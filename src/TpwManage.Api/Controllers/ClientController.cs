@@ -18,8 +18,7 @@ public class ClientController(IClientService service) : ControllerBase
 
     try 
     {
-      var response = await _service.GetAll();
-      return Ok(response);
+      return Ok(await _service.GetAll());
     }
     catch (Exception ex)
     {
