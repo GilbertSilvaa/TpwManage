@@ -22,4 +22,16 @@ public class Product : EntityBase
   public string Color { get; set; }
   public float Price { get; set; }
   public int Amount { get; set; }
+
+  public override string ToString()
+  {
+    return $@"
+      Id: {Id};
+      Name: {Name}; 
+      Color: {Color}; 
+      Price: {Price}; 
+      Amount: {Amount}; 
+      CreateAt: {CreateAt:mm:HH dd/MM/yyyy};
+    ";
+  }
 }

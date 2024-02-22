@@ -1,3 +1,5 @@
+using System.Xml.Linq;
+
 namespace TpwManage.Core.Entities;
 
 public class Selling : EntityBase
@@ -20,5 +22,17 @@ public class Selling : EntityBase
   {
     TotalPrice = 0;
     Products.Clear();
+  }
+
+  public override string ToString()
+  {
+    return $@"
+      Id: {Id};
+      ClientId: {Client.Id}; 
+      ClientName: {Client.Name}; 
+      QtdeProducts: {Products.Count}
+      TotalPrice: {TotalPrice}
+      CreateAt: {CreateAt:mm:HH dd/MM/yyyy};
+    ";
   }
 }
