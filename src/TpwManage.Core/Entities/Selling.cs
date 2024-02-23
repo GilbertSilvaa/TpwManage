@@ -1,9 +1,11 @@
-using System.Xml.Linq;
-
 namespace TpwManage.Core.Entities;
 
 public class Selling : EntityBase
 {
+  public Selling() { }
+
+  public Selling(Client client) => Client = client;
+  
   public Guid ClientId { get; set; }
   public Client Client { get; set; } = default!;
   public List<Product> Products { get; private set; } = [];

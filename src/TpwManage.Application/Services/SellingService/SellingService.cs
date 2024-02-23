@@ -76,11 +76,7 @@ public class SellingService(
         if (stockExists) productList.Add(product);
       }
 
-      Selling selling = new() 
-      { 
-        Client = client 
-      };
-
+      Selling selling = new(client);
       selling.SetupProducts(productList);
 
       var response = await _sellingRepository.CreateAsync(selling);
@@ -112,10 +108,9 @@ public class SellingService(
         if (stockExists) productList.Add(product);
       }
 
-      Selling sellingUpdate = new()
+      Selling sellingUpdate = new(selling.Client)
       { 
         Id = selling.Id, 
-        Client = selling.Client,
         CreateAt = selling.CreateAt
       };
       
