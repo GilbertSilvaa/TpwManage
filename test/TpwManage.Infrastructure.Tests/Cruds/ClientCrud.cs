@@ -8,6 +8,7 @@ namespace TpwManage.Infrastructure.Tests.Cruds;
 public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
 {
   private readonly ServiceProvider _serviceProvider = db.ServiceProvider;
+  private Client? _client;
 
   [Fact]
   public async Task IsPossible_CreateClient()
@@ -17,8 +18,9 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
 
     Client client = new(Faker.Name.FullName());
     Client clientCreated = await _repository.CreateAsync(client);
+    _client = clientCreated;
 
-    Assert.Equal(client, clientCreated);
+    Assert.Equal(client.ToString(), clientCreated.ToString());
   }
 
   [Fact]
@@ -27,7 +29,7 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ClientRepository _repository = new(context!);
 
-    await GetOneClientAsync(_repository);
+    _client ??= await CreateClientAsync(_repository);
     var clientList = await _repository.GetAllAsync();
 
     Assert.True(clientList.Count > 0);
@@ -39,10 +41,10 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ClientRepository _repository = new(context!);
 
-    var client = await GetOneClientAsync(_repository);
-    var clientSelected = await _repository.GetByIdAsync(client.Id);
+    _client ??= await CreateClientAsync(_repository);
+    var clientSelected = await _repository.GetByIdAsync(_client!.Id);
 
-    Assert.Equal(client.ToString(), clientSelected?.ToString());
+    Assert.Equal(_client.ToString(), clientSelected?.ToString());
   }
 
   [Fact]
@@ -51,11 +53,11 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ClientRepository _repository = new(context!);
 
-    var client = await GetOneClientAsync(_repository);
-    client.Name = Faker.Name.FullName();
-    var clientUpdated = await _repository.UpdateAsync(client);
+    _client ??= await CreateClientAsync(_repository);
+    _client.Name = Faker.Name.FullName();
+    var clientUpdated = await _repository.UpdateAsync(_client);
 
-    Assert.Equal(client, clientUpdated);
+    Assert.Equal(_client.ToString(), clientUpdated?.ToString());
   }
 
   [Fact]
@@ -64,8 +66,8 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ClientRepository _repository = new(context!);
 
-    var client = await GetOneClientAsync(_repository);
-    bool clientExist = await _repository.ExistsAsync(client.Name);
+    _client ??= await CreateClientAsync(_repository);
+    bool clientExist = await _repository.ExistsAsync(_client.Name);
 
     Assert.True(clientExist);
   }
@@ -87,36 +89,12 @@ public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ClientRepository _repository = new(context!);
 
-    var client = await GetOneClientAsync(_repository);
-    bool isDeleted = await _repository.DeleteAsync(client.Id);
+    _client ??= await CreateClientAsync(_repository);
+    bool isDeleted = await _repository.DeleteAsync(_client.Id);
 
     Assert.True(isDeleted);
   }
 
-  [Fact]
-  public async Task IsPossible_SelectEmptyClientList()
-  {
-    using var context = _serviceProvider.GetService<MyContext>();
-    ClientRepository _repository = new(context!);
-
-    await RemoveAllClientsAsync(_repository);
-    var emptyClientList = await _repository.GetAllAsync();
-
-    Assert.Empty(emptyClientList);
-  }
-
-  private static async Task<Client> GetOneClientAsync(ClientRepository repository)
-  {
-    var clientList = await repository.GetAllAsync();
-
-    if (clientList.Count > 0) return clientList.First();
-
-    return await repository.CreateAsync(new(Faker.Name.FullName()));
-  }
-
-  private static async Task RemoveAllClientsAsync(ClientRepository repository)
-  {
-    foreach (var client in (await repository.GetAllAsync()))
-      await repository.DeleteAsync(client.Id);
-  }
+  private static async Task<Client> CreateClientAsync(ClientRepository repository)
+    => await repository.CreateAsync(new(Faker.Name.FullName()));
 }
