@@ -45,6 +45,20 @@ public class SellingService(
     }
   }
   
+  public async Task<List<SellingViewModel>> GetByClientId(Guid clientId)
+  {
+    try
+    {
+      var response = await _sellingRepository.GetByClientIdAsync(clientId);
+      return [.. response.Select(SellingViewModel.FromEntity)
+        .OrderByDescending(s => s.DateSale)];
+    }
+    catch (Exception ex)
+    {
+      throw new Exception(ex.Message);
+    }
+  }
+
   public async Task<SellingViewModel> Create(CreateSellingInputModel model)
   {
     try
@@ -62,11 +76,7 @@ public class SellingService(
         if (stockExists) productList.Add(product);
       }
 
-      Selling selling = new() 
-      { 
-        Client = client 
-      };
-
+      Selling selling = new(client);
       selling.SetupProducts(productList);
 
       var response = await _sellingRepository.CreateAsync(selling);
@@ -98,10 +108,9 @@ public class SellingService(
         if (stockExists) productList.Add(product);
       }
 
-      Selling sellingUpdate = new()
+      Selling sellingUpdate = new(selling.Client)
       { 
         Id = selling.Id, 
-        Client = selling.Client,
         CreateAt = selling.CreateAt
       };
       

@@ -8,15 +8,16 @@ namespace TpwManage.Infrastructure;
 public abstract class RepositoryBase<T>(MyContext context) : 
   IRepositoryBase<T> where T : EntityBase
 {
+  private readonly string? _dbTableName = context.Model.FindEntityType(typeof(T))?.GetTableName();
   protected readonly MyContext _context = context;
   protected readonly DbSet<T> _dataSet = context.Set<T>();
+  protected readonly DapperContext _dapper = new(context);
 
   public virtual async Task<List<T>> GetAllAsync()
   {
     try
     {
-      var response = await _dataSet.ToListAsync();
-      return response;
+      return await _dapper.ExecuteQueryAsync<T>($"SELECT * FROM {_dbTableName}");
     }
     catch (Exception ex)
     {
@@ -29,8 +30,9 @@ public abstract class RepositoryBase<T>(MyContext context) :
   {
     try 
     {
-      var response = await _dataSet.SingleOrDefaultAsync(r => r.Id.Equals(id));
-      return response;
+      return (await _dapper
+        .ExecuteQueryAsync<T>($"SELECT * FROM {_dbTableName} WHERE Id = '{id}'"))
+        .FirstOrDefault();
     }
     catch (Exception ex) 
     {

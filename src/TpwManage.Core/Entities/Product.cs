@@ -1,9 +1,37 @@
 namespace TpwManage.Core.Entities;
 
-public class Product(string name, string color, float price, int amount) : EntityBase
+public class Product : EntityBase
 {
-  public string Name { get; set; } = name;
-  public string Color { get; set; } = color;
-  public float Price { get; set; } = price;
-  public int Amount { get; set; } = amount;
+  public Product() 
+  { 
+    Name = string.Empty;
+    Color = string.Empty;
+    Price = float.MinValue;
+    Amount = int.MinValue;
+  }
+
+  public Product(string name, string color, float price, int amount)
+  {
+    Name = name;
+    Color = color;
+    Price = price;
+    Amount = amount;
+  }
+
+  public string Name { get; set; }
+  public string Color { get; set; }
+  public float Price { get; set; }
+  public int Amount { get; set; }
+
+  public override string ToString()
+  {
+    return $@"
+      Id: {Id};
+      Name: {Name}; 
+      Color: {Color}; 
+      Price: {Price}; 
+      Amount: {Amount}; 
+      CreateAt: {CreateAt:mm:HH dd/MM/yyyy};
+    ";
+  }
 }
