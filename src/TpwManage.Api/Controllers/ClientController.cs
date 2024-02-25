@@ -1,15 +1,19 @@
 using System.Net;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TpwManage.Application.InputModels;
-using TpwManage.Application.Services.ClientService;
+using TpwManage.Application.ClientService.Commands.CreateClient;
+using TpwManage.Application.ClientService.Commands.DeleteClient;
+using TpwManage.Application.ClientService.Commands.UpdateClient;
+using TpwManage.Application.ClientService.Queries.GetClientById;
+using TpwManage.Application.ClientService.Queries.GetClients;
 
 namespace TpwManage.Api.Controllers;
 
 [ApiController]
 [Route("api/client")]
-public class ClientController(IClientService service) : ControllerBase
+public class ClientController(IMediator mediator) : ControllerBase
 {
-  private readonly IClientService _service = service;
+  private readonly ISender _mediator = mediator;
 
   [HttpGet]
   public async Task<IActionResult> GetAll() 
@@ -18,7 +22,8 @@ public class ClientController(IClientService service) : ControllerBase
 
     try 
     {
-      return Ok(await _service.GetAll());
+      GetClientsQuery query = new();
+      return Ok(await _mediator.Send(query));
     }
     catch (Exception ex)
     {
@@ -27,14 +32,14 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpGet]
-  [Route("{id}", Name = "GetClientById")]
-  public async Task<IActionResult> Get(Guid id)
+  [Route("Id", Name = "GetClientById")]
+  public async Task<IActionResult> Get([FromQuery] GetClientByIdQuery query)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
-      var response = await _service.GetById(id);      
+      var response = await _mediator.Send(query);
       return response == null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
@@ -44,15 +49,14 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create([FromBody] CreateClientInputModel model)
+  public async Task<IActionResult> Create([FromBody] CreateClientCommand command)
   {
-    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
+    if (!ModelState.IsValid) return BadRequest(ModelState);
     
     try 
     {
-      var response = await _service.Create(model);
-      var linkRedirect = Url.Link("GetClientById", new { id =  response.Id})!;
-      return Created(new Uri(linkRedirect), response);
+      var response = await _mediator.Send(command);
+      return StatusCode((int)HttpStatusCode.Created, response);
     }
     catch (Exception ex)
     {
@@ -61,13 +65,13 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpPut]
-  public async Task<IActionResult> Update([FromBody] UpdateClientInputModel model)
+  public async Task<IActionResult> Update([FromBody] UpdateClientCommand command)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
-      var response = await _service.Update(model);  
+      var response = await _mediator.Send(command);
       return response == null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
@@ -77,14 +81,13 @@ public class ClientController(IClientService service) : ControllerBase
   }
 
   [HttpDelete]
-  [Route("{id}")]
-  public async Task<IActionResult> Delete(Guid id)
+  public async Task<IActionResult> Delete([FromQuery] DeleteClientCommand command)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
-      var response = await _service.Delete(id);
+      var response = await _mediator.Send(command);
       return !response ? NotFound() : Ok("Cliente deletado com sucesso.");
     }
     catch (Exception ex)
