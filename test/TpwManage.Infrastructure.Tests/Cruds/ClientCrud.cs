@@ -5,7 +5,7 @@ using TpwManage.Infrastructure.Persistence.Repositories;
 
 namespace TpwManage.Infrastructure.Tests.Cruds;
 
-public class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
+public sealed class ClientCrud(DbTest db) : TestBase, IClassFixture<DbTest>
 {
   private readonly ServiceProvider _serviceProvider = db.ServiceProvider;
   private Client? _client;
