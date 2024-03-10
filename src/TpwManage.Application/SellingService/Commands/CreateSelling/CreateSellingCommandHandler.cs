@@ -26,7 +26,12 @@ internal class CreateSellingCommandHandler(
         ?? throw new ClientNotFoundException();
 
       Selling selling = new(client);
-      selling.SetupProducts(await StockProductController(request.ProductsId));
+      var productList = await StockProductController(request.ProductsId);
+
+      if (productList.Count == 0) 
+        throw new Exception("Lista de produtos vazia.");
+
+      selling.SetupProducts(productList);
 
       var response = await _sellingRepository.CreateAsync(selling);
       return SellingResponse.FromEntity(response);

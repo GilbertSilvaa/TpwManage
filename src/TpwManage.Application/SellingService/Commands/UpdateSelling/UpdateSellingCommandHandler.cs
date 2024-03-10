@@ -32,7 +32,12 @@ internal class UpdateSellingCommandHandler(
         CreateAt = selling.CreateAt
       };
 
-      sellingUpdate.SetupProducts(await StockProductController(request.ProductsId));
+      var productList = await StockProductController(request.ProductsId);
+
+      if (productList.Count == 0) 
+        throw new Exception("Lista de produtos vazia.");
+
+      sellingUpdate.SetupProducts(productList);
 
       var response = await _sellingRepository.UpdateAsync(sellingUpdate);
       return SellingResponse.FromEntity(response!);
