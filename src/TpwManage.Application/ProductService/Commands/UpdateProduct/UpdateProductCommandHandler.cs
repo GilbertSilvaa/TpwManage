@@ -33,10 +33,7 @@ internal class UpdateProductCommandHandler(IProductRepository repository)
       ?? throw new ProductNotFoundException();
 
     bool fieldsChanged = product.Name != response.Name || product.Color != response.Color;
-    if (fieldsChanged) 
-    {
-      if (await _repository.ExistsAsync(product.Name, product.Color))
-        throw new InvalidOperationException("Já existe um produto com esse nome e cor.");
-    }
+    if (fieldsChanged && await _repository.ExistsAsync(product.Name, product.Color))
+      throw new InvalidOperationException("Já existe um produto com esse nome e cor.");
   }
 }

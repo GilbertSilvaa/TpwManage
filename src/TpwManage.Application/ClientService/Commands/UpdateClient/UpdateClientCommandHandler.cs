@@ -33,10 +33,7 @@ internal class UpdateClientCommandHandler(IClientRepository repository)
       ?? throw new ClientNotFoundException();
 
     bool fieldsChanged = client.Name != response.Name;
-    if (fieldsChanged) 
-    {
-      if (await _repository.ExistsAsync(client.Name))
-        throw new InvalidOperationException("Já existe um cliente com esse nome.");
-    }
+    if (fieldsChanged && await _repository.ExistsAsync(client.Name))
+      throw new InvalidOperationException("Já existe um cliente com esse nome.");
   }
 }
