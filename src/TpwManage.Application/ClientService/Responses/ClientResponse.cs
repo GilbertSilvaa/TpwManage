@@ -1,6 +1,6 @@
 ﻿using TpwManage.Core.Entities;
 
-namespace TpwManage.Application.ClientService.Queries.GetClients;
+namespace TpwManage.Application;
 
 internal class ClientResponse(Guid id, string name)
 {

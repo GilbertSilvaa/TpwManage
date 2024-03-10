@@ -4,7 +4,7 @@ using TpwManage.Core.Entities;
 
 namespace TpwManage.Application.ProductService.Commands.CreateProduct;
 
-public class CreateProductCommand : IRequest<CreateProductResponseDto>
+public class CreateProductCommand : IRequest<ProductResponse>
 {
   [Required(ErrorMessage = "Nome é um campo obrigatório.")]
   [StringLength(250, ErrorMessage = "O nome pode ter no maximo {1} caracteres.")]

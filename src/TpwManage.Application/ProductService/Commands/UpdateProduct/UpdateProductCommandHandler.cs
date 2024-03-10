@@ -6,11 +6,11 @@ using TpwManage.Core.Repositories;
 namespace TpwManage.Application.ProductService.Commands.UpdateProduct;
 
 internal class UpdateProductCommandHandler(IProductRepository repository)
-  : IRequestHandler<UpdateProductCommand, UpdateProductResponse>
+  : IRequestHandler<UpdateProductCommand, ProductResponse>
 {
   private readonly IProductRepository _repository = repository;
 
-  public async Task<UpdateProductResponse> Handle(
+  public async Task<ProductResponse> Handle(
     UpdateProductCommand request, 
     CancellationToken cancellationToken)
   {
@@ -19,7 +19,7 @@ internal class UpdateProductCommandHandler(IProductRepository repository)
       await Validation(request.ToEntity());
 
       var response = await _repository.UpdateAsync(request.ToEntity());
-      return UpdateProductResponse.FromEntity(response!);
+      return ProductResponse.FromEntity(response!);
     }
     catch (Exception ex)
     {

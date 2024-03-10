@@ -9,13 +9,13 @@ internal class CreateSellingCommandHandler(
   ISellingRepository sellingRepository,
   IClientRepository clientRepository,
   IProductRepository productRepository)
-  : IRequestHandler<CreateSellingCommand, CreateSellingResponse>
+  : IRequestHandler<CreateSellingCommand, SellingResponse>
 {
   private readonly ISellingRepository _sellingRepository = sellingRepository;
   private readonly IClientRepository _clientRepository = clientRepository;
   private readonly IProductRepository _productRepository = productRepository;
 
-  public async Task<CreateSellingResponse> Handle(
+  public async Task<SellingResponse> Handle(
     CreateSellingCommand request, 
     CancellationToken cancellationToken)
   {
@@ -38,7 +38,7 @@ internal class CreateSellingCommandHandler(
       selling.SetupProducts(productList);
 
       var response = await _sellingRepository.CreateAsync(selling);
-      return CreateSellingResponse.FromEntity(response);
+      return SellingResponse.FromEntity(response);
     }
     catch (Exception ex)
     {

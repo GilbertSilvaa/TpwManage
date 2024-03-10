@@ -4,11 +4,11 @@ using TpwManage.Core.Repositories;
 namespace TpwManage.Application.ProductService.Commands.CreateProduct;
 
 internal class CreateProductCommandHandler(IProductRepository repository)
-  : IRequestHandler<CreateProductCommand, CreateProductResponseDto>
+  : IRequestHandler<CreateProductCommand, ProductResponse>
 {
   private readonly IProductRepository _repository = repository;
 
-  public async Task<CreateProductResponseDto> Handle(
+  public async Task<ProductResponse> Handle(
     CreateProductCommand request, 
     CancellationToken cancellationToken)
   {
@@ -21,7 +21,7 @@ internal class CreateProductCommandHandler(IProductRepository repository)
         throw new InvalidOperationException("Esse produto já existe.");
 
       var response = await _repository.CreateAsync(product);
-      return CreateProductResponseDto.FromEntity(response);
+      return ProductResponse.FromEntity(response);
     }
     catch (Exception ex)
     {

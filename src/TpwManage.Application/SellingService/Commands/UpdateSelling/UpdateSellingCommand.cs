@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TpwManage.Application.SellingService.Commands.UpdateSelling;
 
-public class UpdateSellingCommand : IRequest<UpdateSellingResponse>
+public class UpdateSellingCommand : IRequest<SellingResponse>
 {
   [Required(ErrorMessage = "Id é um campo obrigatório.")]
   public Guid Id { get; set; }

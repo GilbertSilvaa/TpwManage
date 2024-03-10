@@ -2,6 +2,6 @@
 
 namespace TpwManage.Application.ClientService.Queries.GetClientById;
 
-public record GetClientByIdQuery(Guid Id) : IRequest<ClientByIdResponse>;
+public record GetClientByIdQuery(Guid Id) : IRequest<ClientResponse>;
 
 

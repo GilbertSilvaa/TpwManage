@@ -8,12 +8,12 @@ namespace TpwManage.Application.SellingService.Commands.UpdateSelling;
 internal class UpdateSellingCommandHandler(
   ISellingRepository sellingRepository,
   IProductRepository productRepository)
-  : IRequestHandler<UpdateSellingCommand, UpdateSellingResponse>
+  : IRequestHandler<UpdateSellingCommand, SellingResponse>
 {
   private readonly ISellingRepository _sellingRepository = sellingRepository;
   private readonly IProductRepository _productRepository = productRepository;
 
-  public async Task<UpdateSellingResponse> Handle(
+  public async Task<SellingResponse> Handle(
     UpdateSellingCommand request, 
     CancellationToken cancellationToken)
   {
@@ -44,7 +44,7 @@ internal class UpdateSellingCommandHandler(
       sellingUpdate.SetupProducts(productList);
 
       var response = await _sellingRepository.UpdateAsync(sellingUpdate);
-      return UpdateSellingResponse.FromEntity(response!);
+      return SellingResponse.FromEntity(response!);
     }
     catch (Exception ex)
     {

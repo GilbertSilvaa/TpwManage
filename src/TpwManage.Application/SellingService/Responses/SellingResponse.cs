@@ -1,6 +1,6 @@
 ﻿using TpwManage.Core.Entities;
 
-namespace TpwManage.Application.SellingService.Queries.GetSellingsByClientId;
+namespace TpwManage.Application;
 
 internal class SellingResponse(
   Guid id,
@@ -26,10 +26,10 @@ internal class SellingResponse(
 
 internal class ProductSelling(Guid id, string name, string color, float price)
 {
-  public Guid Id { get; } = id;
-  public string Name { get; } = name;
-  public string Color { get; } = color;
-  public float Price { get; } = price;
+  public Guid Id { get; private set; } = id;
+  public string Name { get; private set; } = name;
+  public string Color { get; set; } = color;
+  public float Price { get; set; } = price;
 
   public static ProductSelling FromEntity(Product product)
     => new(

@@ -5,11 +5,11 @@ using TpwManage.Core.Repositories;
 namespace TpwManage.Application.SellingService.Queries.GetSellingById;
 
 internal class GetSellingByIdQueryHandler(ISellingRepository repository)
-  : IRequestHandler<GetSellingByIdQuery, SellingByIdResponse>
+  : IRequestHandler<GetSellingByIdQuery, SellingResponse>
 {
   private readonly ISellingRepository _repository = repository;
 
-  public async Task<SellingByIdResponse> Handle(
+  public async Task<SellingResponse> Handle(
     GetSellingByIdQuery request, 
     CancellationToken cancellationToken)
   {
@@ -18,7 +18,7 @@ internal class GetSellingByIdQueryHandler(ISellingRepository repository)
       var response = await _repository.GetByIdAsync(request.Id)
         ?? throw new SellingNotFoundException();
 
-      return SellingByIdResponse.FromEntity(response);
+      return SellingResponse.FromEntity(response);
     }
     catch (Exception ex)
     {

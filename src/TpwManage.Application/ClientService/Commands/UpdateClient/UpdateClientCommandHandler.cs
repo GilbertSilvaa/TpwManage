@@ -6,11 +6,11 @@ using TpwManage.Core.Repositories;
 namespace TpwManage.Application.ClientService.Commands.UpdateClient;
 
 internal class UpdateClientCommandHandler(IClientRepository repository)
-  : IRequestHandler<UpdateClientCommand, UpdateClientResponse>
+  : IRequestHandler<UpdateClientCommand, ClientResponse>
 {
   private readonly IClientRepository _repository = repository;
 
-  public async Task<UpdateClientResponse> Handle(
+  public async Task<ClientResponse> Handle(
     UpdateClientCommand request, 
     CancellationToken cancellationToken)
   {
@@ -19,7 +19,7 @@ internal class UpdateClientCommandHandler(IClientRepository repository)
       await Validation(request.ToEntity());
 
       var response = await _repository.UpdateAsync(request.ToEntity());
-      return UpdateClientResponse.FromEntity(response!);
+      return ClientResponse.FromEntity(response!);
     }
     catch (Exception ex)
     {

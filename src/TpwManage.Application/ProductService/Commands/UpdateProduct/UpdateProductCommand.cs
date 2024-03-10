@@ -4,7 +4,7 @@ using TpwManage.Core.Entities;
 
 namespace TpwManage.Application.ProductService.Commands.UpdateProduct;
 
-public class UpdateProductCommand : IRequest<UpdateProductResponse>
+public class UpdateProductCommand : IRequest<ProductResponse>
 {
   [Required(ErrorMessage = "Id é um campo obrigatório.")]
   public Guid Id { get; set; }

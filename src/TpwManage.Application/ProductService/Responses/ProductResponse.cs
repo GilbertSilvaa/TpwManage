@@ -1,8 +1,8 @@
 ﻿using TpwManage.Core.Entities;
 
-namespace TpwManage.Application.ProductService.Queries.GetProductById;
+namespace TpwManage.Application;
 
-internal class ProductByIdResponse(Guid id, string name, string color, float price, int amount)
+internal class ProductResponse(Guid id, string name, string color, float price, int amount)
 {
   public Guid Id { get; private set; } = id;
   public string Name { get; private set; } = name;
@@ -10,7 +10,7 @@ internal class ProductByIdResponse(Guid id, string name, string color, float pri
   public float Price { get; set; } = price;
   public int Amount { get; set; } = amount;
 
-  public static ProductByIdResponse FromEntity(Product product)
+  public static ProductResponse FromEntity(Product product)
     => new(
       product.Id,
       product.Name,

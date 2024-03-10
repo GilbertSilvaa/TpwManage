@@ -4,7 +4,7 @@ using TpwManage.Core.Entities;
 
 namespace TpwManage.Application.ClientService.Commands.CreateClient;
 
-public class CreateClientCommand : IRequest<CreateClientResponse>
+public class CreateClientCommand : IRequest<ClientResponse>
 {
   [Required(ErrorMessage = "Nome é um campo obrigatório.")]
   [StringLength(150, ErrorMessage = "O nome pode ter no maximo {1} caracteres.")]
