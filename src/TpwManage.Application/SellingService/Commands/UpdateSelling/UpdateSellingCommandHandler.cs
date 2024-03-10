@@ -26,23 +26,13 @@ internal class UpdateSellingCommandHandler(
       foreach (var product in selling.Products)
         await _productStockHelper.AdjustStock(product, 1);
 
-      List<Product> productList = [];
-      foreach (var productId in request.ProductsId)
-      {
-        var product = await _productRepository.GetByIdAsync(productId);
-        if (product is null) continue;
-
-        var stockExists = await _productStockHelper.AdjustStock(product, -1);
-        if (stockExists) productList.Add(product);
-      }
-
       Selling sellingUpdate = new(selling.Client)
       {
         Id = selling.Id,
         CreateAt = selling.CreateAt
       };
 
-      sellingUpdate.SetupProducts(productList);
+      sellingUpdate.SetupProducts(await StockProductController(request.ProductsId));
 
       var response = await _sellingRepository.UpdateAsync(sellingUpdate);
       return SellingResponse.FromEntity(response!);
@@ -51,5 +41,20 @@ internal class UpdateSellingCommandHandler(
     {
       throw new Exception(ex.Message);
     }
+  }
+
+  private async Task<List<Product>> StockProductController(IEnumerable<Guid> productIdList)
+  {
+    List<Product> productList = [];
+    foreach (var productId in productIdList)
+    {
+      var product = await _productRepository.GetByIdAsync(productId);
+      if (product is null) continue;
+
+      var stockExists = await _productStockHelper.AdjustStock(product, -1);
+      if (stockExists) productList.Add(product);
+    }
+
+    return productList;
   }
 }
