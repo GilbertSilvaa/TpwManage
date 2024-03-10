@@ -14,6 +14,7 @@ internal class CreateSellingCommandHandler(
   private readonly ISellingRepository _sellingRepository = sellingRepository;
   private readonly IClientRepository _clientRepository = clientRepository;
   private readonly IProductRepository _productRepository = productRepository;
+  private readonly ProductStockHelper _productStockHelper = new(productRepository);
 
   public async Task<SellingResponse> Handle(
     CreateSellingCommand request, 
@@ -30,7 +31,7 @@ internal class CreateSellingCommandHandler(
         var product = await _productRepository.GetByIdAsync(productId);
         if (product is null) continue;
 
-        var stockExists = await ChangeAmountProductStock(product, -1);
+        var stockExists = await _productStockHelper.AdjustStock(product, -1);
         if (stockExists) productList.Add(product);
       }
 
@@ -39,22 +40,6 @@ internal class CreateSellingCommandHandler(
 
       var response = await _sellingRepository.CreateAsync(selling);
       return SellingResponse.FromEntity(response);
-    }
-    catch (Exception ex)
-    {
-      throw new Exception(ex.Message);
-    }
-  }
-
-  private async Task<bool> ChangeAmountProductStock(Product product, int amount)
-  {
-    try
-    {
-      if (product.Amount == 0) return false;
-
-      product.Amount += amount;
-      var response = await _productRepository.UpdateAsync(product);
-      return response is not null;
     }
     catch (Exception ex)
     {
