@@ -1,15 +1,20 @@
 using System.Net;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TpwManage.Application.InputModels;
-using TpwManage.Application.Services.SellingService;
+using TpwManage.Application.SellingService.Commands.CreateSelling;
+using TpwManage.Application.SellingService.Commands.DeleteSelling;
+using TpwManage.Application.SellingService.Commands.UpdateSelling;
+using TpwManage.Application.SellingService.Queries.GetSellingById;
+using TpwManage.Application.SellingService.Queries.GetSellings;
+using TpwManage.Application.SellingService.Queries.GetSellingsByClientId;
 
 namespace TpwManage.Api.Controllers;
 
 [ApiController]
 [Route("api/selling")]
-public class SellingController(ISellingService service) : ControllerBase
+public class SellingController(IMediator mediator) : ControllerBase
 {
-  private readonly ISellingService _service = service;
+  private readonly ISender _mediator = mediator;
 
   [HttpGet]
   public async Task<IActionResult> GetAll() 
@@ -18,7 +23,8 @@ public class SellingController(ISellingService service) : ControllerBase
     
     try 
     {
-      return Ok(await _service.GetAll());
+      GetSellingsQuery query = new();
+      return Ok(await _mediator.Send(query));
     }
     catch (Exception ex)
     {
@@ -34,7 +40,8 @@ public class SellingController(ISellingService service) : ControllerBase
 
     try 
     {
-      var response = await _service.GetById(id);
+      GetSellingByIdQuery query = new(id);
+      var response = await _mediator.Send(query);
       return response == null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
@@ -51,7 +58,8 @@ public class SellingController(ISellingService service) : ControllerBase
 
     try
     {
-      return Ok(await _service.GetByClientId(clientId));
+      GetSellingsByClientIdQuery query = new(clientId);
+      return Ok(await _mediator.Send(query));
     }
     catch (Exception ex)
     {
@@ -60,15 +68,14 @@ public class SellingController(ISellingService service) : ControllerBase
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create([FromBody] CreateSellingInputModel model)
+  public async Task<IActionResult> Create([FromBody] CreateSellingCommand command)
   {
-    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
+    if (!ModelState.IsValid) return BadRequest(ModelState);
     
     try 
     {
-      var response = await _service.Create(model);
-      var linkRedirect = Url.Link("GetSellingById", new { id = response.Id })!;
-      return Created(new Uri(linkRedirect), response);
+      var response = await _mediator.Send(command);
+      return StatusCode((int)HttpStatusCode.Created, response);
     }
     catch (Exception ex)
     {
@@ -77,13 +84,13 @@ public class SellingController(ISellingService service) : ControllerBase
   }
   
   [HttpPut]
-  public async Task<IActionResult> Update([FromBody] UpdateSellingInputModel model)
+  public async Task<IActionResult> Update([FromBody] UpdateSellingCommand command)
   {
-    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
+    if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
-      var response = await _service.Update(model);
+      var response = await _mediator.Send(command);
       return response == null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
@@ -100,7 +107,8 @@ public class SellingController(ISellingService service) : ControllerBase
 
     try 
     {
-      var response = await _service.Delete(id); 
+      DeleteSellingCommand command = new(id);
+      var response = await _mediator.Send(command); 
       return !response ? NotFound() : Ok("Venda deletada com sucesso.");
     }
     catch (Exception ex)

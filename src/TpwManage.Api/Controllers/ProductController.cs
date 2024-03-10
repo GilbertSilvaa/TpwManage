@@ -1,15 +1,19 @@
 using System.Net;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TpwManage.Application.InputModels;
-using TpwManage.Application.Services.ProductService;
+using TpwManage.Application.ProductService.Commands.CreateProduct;
+using TpwManage.Application.ProductService.Commands.DeleteProduct;
+using TpwManage.Application.ProductService.Commands.UpdateProduct;
+using TpwManage.Application.ProductService.Queries.GetProductById;
+using TpwManage.Application.ProductService.Queries.GetProducts;
 
 namespace TpwManage.Api.Controllers;
 
 [ApiController]
 [Route("api/product")]
-public class ProductController(IProductService service) : ControllerBase
+public class ProductController(IMediator mediator) : ControllerBase
 {
-  private readonly IProductService _service = service;
+  private readonly ISender _mediator = mediator;
 
   [HttpGet]
   public async Task<IActionResult> GetAll()
@@ -18,7 +22,8 @@ public class ProductController(IProductService service) : ControllerBase
 
     try 
     {
-      return Ok(await _service.GetAll());
+      GetProductsQuery query = new();
+      return Ok(await _mediator.Send(query));
     }
     catch (Exception ex)
     {
@@ -34,8 +39,9 @@ public class ProductController(IProductService service) : ControllerBase
 
     try 
     {
-      var response = await _service.GetById(id);      
-      return response == null ? NotFound() : Ok(response);
+      GetProductByIdQuery query = new(id);
+      var response = await _mediator.Send(query);
+      return response is null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
     {
@@ -44,15 +50,14 @@ public class ProductController(IProductService service) : ControllerBase
   }
 
   [HttpPost]
-  public async Task<IActionResult> Create([FromBody] CreateProductInputModel model)
+  public async Task<IActionResult> Create([FromBody] CreateProductCommand command)
   {
-    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
+    if (!ModelState.IsValid) return BadRequest(ModelState);
     
     try 
     {
-      var response = await _service.Create(model);
-      var linkRedirect = Url.Link("GetProductById", new { id =  response.Id})!;
-      return Created(new Uri(linkRedirect), response);
+      var response = await _mediator.Send(command);
+      return StatusCode((int)HttpStatusCode.Created, response);
     }
     catch (Exception ex)
     {
@@ -61,14 +66,14 @@ public class ProductController(IProductService service) : ControllerBase
   }
 
   [HttpPut]
-  public async Task<IActionResult> Update([FromBody] UpdateProductInputModel model)
+  public async Task<IActionResult> Update([FromBody] UpdateProductCommand command)
   {
-    if (!ModelState.IsValid || model == null) return BadRequest(ModelState);
+    if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
-      var response = await _service.Update(model);
-      return response == null ? NotFound() : Ok(response);
+      var response = await _mediator.Send(command);
+      return response is null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
     {
@@ -84,7 +89,8 @@ public class ProductController(IProductService service) : ControllerBase
 
     try 
     {
-      var response = await _service.Delete(id);
+      DeleteProductCommand command = new(id);
+      var response = await _mediator.Send(command);
       return !response ? NotFound() : Ok("Produto deletado com sucesso.");
     }
     catch (Exception ex)

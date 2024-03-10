@@ -32,15 +32,16 @@ public class ClientController(IMediator mediator) : ControllerBase
   }
 
   [HttpGet]
-  [Route("Id", Name = "GetClientById")]
-  public async Task<IActionResult> Get([FromQuery] GetClientByIdQuery query)
+  [Route("{id}", Name = "GetClientById")]
+  public async Task<IActionResult> Get(Guid id)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
+      GetClientByIdQuery query = new(id);
       var response = await _mediator.Send(query);
-      return response == null ? NotFound() : Ok(response);
+      return response is null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
     {
@@ -72,7 +73,7 @@ public class ClientController(IMediator mediator) : ControllerBase
     try 
     {
       var response = await _mediator.Send(command);
-      return response == null ? NotFound() : Ok(response);
+      return response is null ? NotFound() : Ok(response);
     }
     catch (Exception ex)
     {
@@ -81,12 +82,14 @@ public class ClientController(IMediator mediator) : ControllerBase
   }
 
   [HttpDelete]
-  public async Task<IActionResult> Delete([FromQuery] DeleteClientCommand command)
+  [Route("{id}")]
+  public async Task<IActionResult> Delete(Guid id)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
 
     try 
     {
+      DeleteClientCommand command = new(id);
       var response = await _mediator.Send(command);
       return !response ? NotFound() : Ok("Cliente deletado com sucesso.");
     }

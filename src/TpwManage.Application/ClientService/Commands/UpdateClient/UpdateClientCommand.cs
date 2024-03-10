@@ -4,7 +4,7 @@ using TpwManage.Core.Entities;
 
 namespace TpwManage.Application.ClientService.Commands.UpdateClient;
 
-public class UpdateClientCommand : IRequest<UpdateClientResponseDto>
+public class UpdateClientCommand : IRequest<UpdateClientResponse>
 {
   [Required(ErrorMessage = "Id é um campo obrigatório.")]
   public Guid Id { get; set; }

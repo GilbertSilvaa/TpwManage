@@ -6,11 +6,11 @@ using TpwManage.Core.Repositories;
 namespace TpwManage.Application.ClientService.Commands.UpdateClient;
 
 internal class UpdateClientCommandHandler(IClientRepository repository)
-  : IRequestHandler<UpdateClientCommand, UpdateClientResponseDto>
+  : IRequestHandler<UpdateClientCommand, UpdateClientResponse>
 {
   private readonly IClientRepository _repository = repository;
 
-  public async Task<UpdateClientResponseDto> Handle(
+  public async Task<UpdateClientResponse> Handle(
     UpdateClientCommand request, 
     CancellationToken cancellationToken)
   {
@@ -19,8 +19,7 @@ internal class UpdateClientCommandHandler(IClientRepository repository)
       await Validation(request.ToEntity());
 
       var response = await _repository.UpdateAsync(request.ToEntity());
-
-      return UpdateClientResponseDto.FromEntity(response!);
+      return UpdateClientResponse.FromEntity(response!);
     }
     catch (Exception ex)
     {
@@ -33,7 +32,7 @@ internal class UpdateClientCommandHandler(IClientRepository repository)
     var response = await _repository.GetByIdAsync(client.Id)
       ?? throw new ClientNotFoundException();
 
-    if (client.Name != response.Name && await _repository.ExistsAsync(response.Name))
+    if (client.Name != response.Name && await _repository.ExistsAsync(client.Name))
       throw new InvalidOperationException("Já existe um cliente com esse nome.");
   }
 }

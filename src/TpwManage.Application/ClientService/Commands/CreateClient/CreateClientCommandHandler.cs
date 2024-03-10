@@ -4,11 +4,11 @@ using TpwManage.Core.Repositories;
 namespace TpwManage.Application.ClientService.Commands.CreateClient;
 
 internal class CreateClientCommandHandler(IClientRepository repository) 
-  : IRequestHandler<CreateClientCommand, CreateClientResponseDto>
+  : IRequestHandler<CreateClientCommand, CreateClientResponse>
 {
   private readonly IClientRepository _repository = repository;
 
-  public async Task<CreateClientResponseDto> Handle(
+  public async Task<CreateClientResponse> Handle(
     CreateClientCommand request, 
     CancellationToken cancellationToken)
   {
@@ -20,7 +20,7 @@ internal class CreateClientCommandHandler(IClientRepository repository)
         throw new InvalidOperationException("Já existe um cliente com esse nome.");
 
       var response = await _repository.CreateAsync(client);
-      return CreateClientResponseDto.FromEntity(response);
+      return CreateClientResponse.FromEntity(response);
     }
     catch (Exception ex)
     {
