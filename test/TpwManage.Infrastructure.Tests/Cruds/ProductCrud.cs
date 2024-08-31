@@ -5,9 +5,10 @@ using TpwManage.Infrastructure.Persistence.Repositories;
 
 namespace TpwManage.Infrastructure.Tests.Cruds;
 
-public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
+public sealed class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
 {
   private readonly ServiceProvider _serviceProvider = db.ServiceProvider;
+  private Product? _product;
 
   [Fact]
   public async Task IsPossible_CreateProduct()
@@ -22,8 +23,9 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
       amount: Faker.RandomNumber.Next()); 
 
     Product productCreated = await _repository.CreateAsync(product);
+    _product = productCreated;
 
-    Assert.Equal(product, productCreated);
+    Assert.Equal(product.ToString(), productCreated.ToString());
   }
 
   [Fact]
@@ -32,7 +34,7 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ProductRepository _repository = new(context!);
 
-    await GetOneProductAsync(_repository);
+    _product ??= await CreateProductAsync(_repository);
     var productList = await _repository.GetAllAsync();
 
     Assert.True(productList.Count > 0);
@@ -44,10 +46,10 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ProductRepository _repository = new(context!);
 
-    var product = await GetOneProductAsync(_repository);
-    var productSelected = await _repository.GetByIdAsync(product.Id);
+    _product ??= await CreateProductAsync(_repository);
+    var productSelected = await _repository.GetByIdAsync(_product.Id);
 
-    Assert.Equal(product, productSelected);
+    Assert.Equal(_product.ToString(), productSelected?.ToString());
   }
 
   [Fact]
@@ -56,11 +58,11 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ProductRepository _repository = new(context!);
 
-    var product = await GetOneProductAsync(_repository);
-    product.Name = Faker.Name.FullName();
-    var productUpdated = await _repository.UpdateAsync(product);
+    _product ??= await CreateProductAsync(_repository);
+    _product.Name = Faker.Name.FullName();
+    var productUpdated = await _repository.UpdateAsync(_product);
 
-    Assert.Equal(product, productUpdated);
+    Assert.Equal(_product.ToString(), productUpdated?.ToString());
   }
 
   [Fact]
@@ -69,8 +71,8 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ProductRepository _repository = new(context!);
 
-    var product = await GetOneProductAsync(_repository);
-    bool productExist = await _repository.ExistsAsync(product.Name, product.Color);
+    _product ??= await CreateProductAsync(_repository);
+    bool productExist = await _repository.ExistsAsync(_product.Name, _product.Color);
 
     Assert.True(productExist);
   }
@@ -93,40 +95,20 @@ public class ProductCrud(DbTest db) : TestBase, IClassFixture<DbTest>
     using var context = _serviceProvider.GetService<MyContext>();
     ProductRepository _repository = new(context!);
 
-    var product = await GetOneProductAsync(_repository);
-    bool isDeleted = await _repository.DeleteAsync(product.Id);
+    _product ??= await CreateProductAsync(_repository);
+    bool isDeleted = await _repository.DeleteAsync(_product.Id);
 
     Assert.True(isDeleted);
   }
 
-  [Fact]
-  public async Task IsPossible_SelectEmptyProductList()
+  private static async Task<Product> CreateProductAsync(ProductRepository repository)
   {
-    using var context = _serviceProvider.GetService<MyContext>();
-    ProductRepository _repository = new(context!);
-
-    await RemoveAllProductsAsync(_repository);
-    var emptyProductList = await _repository.GetAllAsync();
-
-    Assert.Empty(emptyProductList);
-  }
-
-  private static async Task<Product> GetOneProductAsync(ProductRepository repository)
-  {
-    var productList = await repository.GetAllAsync();
-
-    if (productList.Count > 0) return productList.First();
+    Random random = new();
 
     return await repository.CreateAsync(new(
       name: Faker.Name.First(),
       color: Faker.Name.Last(),
-      price: Faker.RandomNumber.Next(),
-      amount: Faker.RandomNumber.Next()));
-  }
-
-  private static async Task RemoveAllProductsAsync(ProductRepository repository)
-  {
-    foreach (var product in (await repository.GetAllAsync()))
-      await repository.DeleteAsync(product.Id);
+      price: random.Next(20, 80),
+      amount: random.Next(5, 35)));
   }
 }

@@ -8,14 +8,12 @@ public class TestBase { }
 
 public class DbTest : IDisposable
 {
-  private readonly string _dbNameRandom;
-
   public ServiceProvider ServiceProvider { get; private set; }
 
   public DbTest()
   {
     string dbNameRandom = Guid.NewGuid().ToString().Replace("-", "");
-    _dbNameRandom = $"dbTpwManageTest_{dbNameRandom}";
+    string _dbNameRandom = $"dbTpwManageTest_{dbNameRandom}";
 
     string conn = $"Server=localhost;Database={_dbNameRandom};Uid=root;Pwd=senha123;";
     ServiceCollection serviceCollection = new();

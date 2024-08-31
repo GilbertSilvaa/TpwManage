@@ -9,16 +9,14 @@ public class SellingRepository(MyContext context) :
   RepositoryBase<Selling>(context), 
   ISellingRepository
 {
+  private readonly ClientRepository _clientRepository = new(context);
+  private readonly ProductRepository _productRepository = new(context);
+
   public override async Task<List<Selling>> GetAllAsync()
   {
     try 
     {
-      var response = await _dataSet
-        .Include(s => s.Products)
-        .Include(s => s.Client)
-        .ToListAsync();
-        
-      return response;
+      return await LoadClientProductsInSellings(await base.GetAllAsync());
     }
     catch (Exception ex) 
     {
@@ -31,14 +29,27 @@ public class SellingRepository(MyContext context) :
   {
     try 
     {
-      var response = await _dataSet
-        .Include(s => s.Products)
-        .Include(s => s.Client)
-        .SingleOrDefaultAsync(r => r.Id.Equals(id));
+      var response = await LoadClientProductsInSellings([await base.GetByIdAsync(id) ?? new()]);
 
-      return response;
+      return response.FirstOrDefault();
     }
     catch (Exception ex) 
+    {
+      var messageException = ex.InnerException?.Message ?? ex.Message;
+      throw new Exception(messageException);
+    }
+  }
+
+  public async Task<List<Selling>> GetByClientIdAsync(Guid clientId)
+  {
+    try
+    {
+      var response = await _dapper
+        .ExecuteQueryAsync<Selling>($@"SELECT * FROM Sellings WHERE ClientId = '{clientId}'");
+
+      return await LoadClientProductsInSellings(response);
+    }
+    catch (Exception ex)
     {
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
@@ -65,5 +76,20 @@ public class SellingRepository(MyContext context) :
       var messageException = ex.InnerException?.Message ?? ex.Message;
       throw new Exception(messageException);
     }
+  }
+
+  private async Task<List<Selling>> LoadClientProductsInSellings(List<Selling> sellings)
+  {
+    List<Selling> sellingsWithClientProducts = [];
+
+    foreach (var s in sellings)
+    {
+      s.Client = await _clientRepository.GetByIdAsync(s.ClientId) ?? new();
+      s.ClearProducts();
+      s.SetupProducts(await _productRepository.GetBySellingIdAsync(s.Id));
+      sellingsWithClientProducts.Add(s);
+    };
+
+    return sellingsWithClientProducts;
   }
 }
